@@ -1,0 +1,5 @@
+APPNAME=HelloWorld \
+ERROR_QUEUE_NAME=error \
+MAX_RETRIES=2 \
+WORKING_DIR=./ \
+../rservicebus_examples

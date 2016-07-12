@@ -1,0 +1,4 @@
+APPNAME=HelloWorld \
+WORKING_DIR=./ \
+RSBCRON_HelloWorld="* * * * *" \
+../rservicebus_examples

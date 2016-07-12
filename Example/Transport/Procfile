@@ -1,0 +1,2 @@
+transporter: env TIMEOUT=2 REMOTE_USER_LOCALHOST=localuser rservicebus-transport
+

@@ -1,0 +1,5 @@
+APPNAME=MyPublisher \
+VERBOSE=true \
+MSGHANDLERPATH=MyPublisher/MessageHandler \
+SUBSCRIPTION_URI=file:///tmp/subs \
+../rservicebus_examples
