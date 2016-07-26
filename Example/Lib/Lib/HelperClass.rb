@@ -1,10 +1,8 @@
 require 'BaseHelperClass'
 
-class HelperClass<BaseHelperClass
-
-	def GetMsg
-		return 'HelloWorld from the Helper'
-	end
-
+# Helper Class
+class HelperClass < BaseHelperClass
+  def msg
+    'HelloWorld from the Helper'
+  end
 end
-

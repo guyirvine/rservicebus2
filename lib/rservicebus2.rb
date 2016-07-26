@@ -55,5 +55,5 @@ require 'rservicebus2/saga_storage'
 require 'rservicebus2/sendat_manager'
 
 # Initial definition of the namespace
-module RServiceBus
+module RServiceBus2
 end

@@ -1,6 +1,7 @@
 module RServiceBus2
   # AppResourceDir
   class AppResourceDir < AppResource
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def connect(uri)
       begin
         input_dir = Dir.new(uri.path)

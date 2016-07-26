@@ -10,7 +10,7 @@ module RServiceBus2
     end
 
     def get_all
-      RServiceBus.log 'Load subscriptions'
+      RServiceBus2.log 'Load subscriptions'
       return {} unless File.exist?(@uri.path)
 
       YAML.load(File.open(@uri.path))

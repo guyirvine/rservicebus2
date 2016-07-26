@@ -28,7 +28,7 @@ module RServiceBus2
     end
 
     # setBusAttributeIfRequested
-    # @param [RServiceBus::Saga] saga
+    # @param [RServiceBus2::Saga] saga
     def set_bus_attribute_if_requested(saga)
       if defined?(saga.bus)
         saga.bus = @host

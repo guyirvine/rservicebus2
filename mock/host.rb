@@ -1,6 +1,6 @@
 module RServiceBus2
   # A means for a stand-alone process to interact with the bus, without
-  #  being a full rservicebus application
+  #  being a full rservicebus2 application
   class MockHost
     def log(_string, _ver = false)
     end

@@ -8,7 +8,7 @@ module RServiceBus2
 
     # Constructor
     #
-    # @param [RServiceBus::Host] host instance
+    # @param [RServiceBus2::Host] host instance
     # @param [Hash] appResources As hash[k,v] where k is the name of a
     #  resource, and v is the resource
     def initialize(host, handler_manager)
@@ -26,7 +26,7 @@ module RServiceBus2
 
       return file_path.sub('.rb', '') if File.exist?(file_path)
 
-      abort('Filepath, ' + file_path + ", given for MessageHandler require
+      abort('Filepath, ' + file_path + ", given for messagehandler require
         doesn't exist")
     end
 
@@ -37,7 +37,7 @@ module RServiceBus2
     # or configuration corrected.
     # @param [String] handler_name name of the handler to instantiate
     # @param [String] file_path the path to the file to be loaded
-    # @return [RServiceBus::Handler] the loader
+    # @return [RServiceBus2::Handler] the loader
     def load_handler_from_file(handler_name, file_path)
       require_path = get_require_path(file_path)
 
@@ -60,19 +60,19 @@ module RServiceBus2
     #
     # @param [String] file_path
     # @param [String] handler_name
-    # @returns [RServiceBus::Handler] handler
+    # @returns [RServiceBus2::Handler] handler
     def load_handler(msg_name, file_path, handler_name)
       if @list_of_loaded_paths.key?(file_path)
-        RServiceBus.log "Not reloading, #{file_path}"
+        RServiceBus2.log "Not reloading, #{file_path}"
         return
       end
 
       begin
-        RServiceBus.rlog 'file_path: ' + file_path
-        RServiceBus.rlog 'handler_name: ' + handler_name
+        RServiceBus2.rlog 'file_path: ' + file_path
+        RServiceBus2.rlog 'handler_name: ' + handler_name
 
         handler = load_handler_from_file(handler_name, file_path)
-        RServiceBus.log 'Loaded Handler: ' + handler_name
+        RServiceBus2.log 'Loaded Handler: ' + handler_name
 
         @handler_manager.add_handler(msg_name, handler)
 
@@ -91,7 +91,7 @@ module RServiceBus2
     # @return [Array] a list of paths to files found in the given path
     def get_list_of_files_for_dir(path)
       list = Dir[path + '/*']
-      RServiceBus.rlog "HandlerLoader.getListOfFilesForDir. path: #{path},
+      RServiceBus2.rlog "HandlerLoader.getListOfFilesForDir. path: #{path},
         list: #{list}"
       list
     end
@@ -109,7 +109,7 @@ module RServiceBus2
         ext_name = File.extname(file_path)
         if !File.directory?(file_path) && ext_name == '.rb'
           file_name = File.basename(file_path).sub('.rb', '')
-          handler_name = "MessageHandler_#{msg_name}_#{file_name}"
+          handler_name = "message_handler_#{msg_name}_#{file_name}".gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1') # Classify
 
           load_handler(msg_name, file_path, handler_name)
         end
@@ -124,23 +124,21 @@ module RServiceBus2
     def get_msg_name(file_path)
       base_name = File.basename(file_path)
       ext_name = File.extname(base_name)
-      file_name = base_name.sub(ext_name, '')
-
-      msg_name = file_name
+      base_name.sub(ext_name, '')
     end
 
     # Load top level handlers from the given directory
     #
     # @param [String] baseDir directory to check - should not have trailing slash
     def load_handlers_from_top_level_path(base_dir)
-      RServiceBus.rlog "HandlerLoader.loadHandlersFromTopLevelPath. baseDir: #{base_dir}"
+      RServiceBus2.rlog "HandlerLoader.loadHandlersFromTopLevelPath. baseDir: #{base_dir}"
       get_list_of_files_for_dir(base_dir).each do |file_path|
         unless file_path.end_with?('.')
           msg_name = get_msg_name(file_path)
           if File.directory?(file_path)
             load_handlers_from_second_level_path(msg_name, file_path)
           else
-            handler_name = "MessageHandler_#{msg_name}"
+            handler_name = "message_handler_#{msg_name}".gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1') # Classify
             load_handler(msg_name, file_path, handler_name)
           end
         end

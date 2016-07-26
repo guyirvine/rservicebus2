@@ -1,13 +1,12 @@
+class Saga_MySaga < RServiceBus2::Saga_Base
+  attr_accessor :bus
 
-class Saga_MySaga<RServiceBus::Saga_Base
-  attr_accessor :Bus
-
-  def StartWith_Msg1(msg)
-    @Bus.Send(Msg2.new(msg.name + ', 2'))
+  def startwith_msg1(msg)
+    @bus.send(Msg2.new(msg.name + ', 2'))
   end
 
-  def Handle_Msg3(msg)
-    @Bus.Send(Msg4.new(msg.name + ', 4'))
-    self.Finish
+  def handle_msg3(msg)
+    @bus.send(Msg4.new(msg.name + ', 4'))
+    finish
   end
 end

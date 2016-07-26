@@ -39,7 +39,7 @@ module RServiceBus2
       end
 
       if uri.path == '' || uri.path == '/'
-        @local_queue_name = RServiceBus.get_value('APPNAME', 'RServiceBus')
+        @local_queue_name = RServiceBus2.get_value('APPNAME', 'RServiceBus')
       else
         @local_queue_name = uri.path
         @local_queue_name[0] = ''
@@ -53,7 +53,7 @@ module RServiceBus2
         abort
       end
 
-      @timeout = RServiceBus.get_value('QUEUE_TIMEOUT', '5').to_i
+      @timeout = RServiceBus2.get_value('QUEUE_TIMEOUT', '5').to_i
       connect(uri.host, uri.port)
       subscribe(@local_queue_name)
     end

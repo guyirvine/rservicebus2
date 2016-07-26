@@ -1,12 +1,10 @@
-
 class MessageHandler_HelloWorld
+  attr_accessor :bus, :testsmbfile
 
-	attr_accessor :Bus, :TestSmbFile
-
-	def Handle( msg )
-		puts 'TestSmbFile: '
-		size = @TestSmbFile.stat.size
-		buffer = @TestSmbFile.read( size )
-		puts "buffer: #{buffer}"
-	end
+  def handle(_msg)
+    puts 'TestSmbFile: '
+    size = @testsmbfile.stat.size
+    buffer = @testsmbfile.read(size)
+    puts "buffer: #{buffer}"
+  end
 end

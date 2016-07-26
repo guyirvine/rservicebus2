@@ -1,14 +1,12 @@
 $:.unshift './../../lib'
-require 'rservicebus'
-require 'rservicebus/Agent'
+require 'rservicebus2'
+require 'rservicebus2/Agent'
 require './Contract'
 
 ENV['RSBMQ'] = 'beanstalk://localhost'
-agent = RServiceBus::Agent.new
+agent = RServiceBus2::Agent.new
 
-agent.sendMsg(HelloWorld.new('Hello World!'), 'HelloWorld', 'helloResponse')
+agent.send_msg(HelloWorld.new('Hello World!'), 'HelloWorld', 'helloResponse')
 
-msg = agent.checkForReply('helloResponse')
+msg = agent.check_for_reply('helloResponse')
 puts msg
-
-

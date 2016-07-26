@@ -1,18 +1,14 @@
-require './RServiceBus'
+require './rservicebus2'
 require './Contract'
 
+abort('Usage: RServiceBus2 [config file name]') if ARGV.length > 1
 
-if ARGV.length > 1 then
-	abort('Usage: RServiceBus [config file name]')
-end
+config_file_path = ARGV.length == 0 ? nil : ARGV[0]
 
-configFilePath = ARGV.length == 0 ? nil : ARGV[0]
-
-Bus = RServiceBus::Host.new(configFilePath)
-	.loadHandlers()
-	.loadSubscriptions()
-	.sendSubscriptions()
+bus = RServiceBus2::Host.new(config_file_path).loadHandlers
+                                              .loadSubscriptions
+                                              .sendSubscriptions
 
 1.upto(1) do |request_nbr|
-	Bus.Publish( HelloWorldEvent.new( "Hello World: " + request_nbr.to_s ) )
+  bus.publish(HelloWorldEvent.new("Hello World: #{request_nbr}"))
 end

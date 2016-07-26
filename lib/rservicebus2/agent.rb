@@ -25,7 +25,7 @@ module RServiceBus2
     def send_msg(message_obj, queue_name, return_address = nil)
       fail QueueNotFoundForMsg, message_obj.class.name if queue_name.nil?
 
-      msg = RServiceBus::Message.new(message_obj, return_address)
+      msg = RServiceBus2::Message.new(message_obj, return_address)
       if queue_name.index('@').nil?
         q = queue_name
       else

@@ -5,7 +5,7 @@ module RServiceBus2
   # Configure Monitors for an rservicebus host
   class ConfigureMonitor
     # Constructor
-    # @param [RServiceBus::Host] host instance
+    # @param [RServiceBus2::Host] host instance
     # @param [Hash] resourceManager As hash[k,v] where k is the name of a
     #  resource, and v is the resource
     def initialize(host, resource_manager)
@@ -18,10 +18,10 @@ module RServiceBus2
 
     # Assigns appropriate resources to writable attributes in the handler that
     #  match keys in the resource hash
-    # @param [RServiceBus::Handler] handler
+    # @param [RServiceBus2::Handler] handler
     def set_app_resources(monitor)
-      RServiceBus.rlog "Checking app resources for: #{monitor.class.name}"
-      RServiceBus.rlog "If your attribute is not getting set, check that it is
+      RServiceBus2.rlog "Checking app resources for: #{monitor.class.name}"
+      RServiceBus2.rlog "If your attribute is not getting set, check that it is
         in the 'attr_accessor' list"
       @resource_manager.get_all.each do |k, v|
         next unless monitor.class.method_defined?(k)

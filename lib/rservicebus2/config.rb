@@ -28,7 +28,7 @@ module RServiceBus2
     # Note. trailing slashs will be stripped
     # Expected format: <path 1>;<path 2>
     def load_handler_path_list
-      paths = get_value('MSGHANDLERPATH', './MessageHandler')
+      paths = get_value('MSGHANDLERPATH', './messagehandler')
       @handler_path_list = []
       paths.split(';').each do |path|
         @handler_path_list << path.strip.chomp('/')
@@ -48,7 +48,7 @@ module RServiceBus2
     end
 
     def load_host_section
-      @app_name = get_value('APPNAME', 'RServiceBus')
+      @app_name = get_value('APPNAME', 'RServiceBus2')
       @error_queue_name = get_value('ERROR_QUEUE_NAME', 'error')
       @max_retries = get_value('MAX_RETRIES', '5').to_i
       @stat_output_countdown = get_value('STAT_OUTPUT_COUNTDOWN', '100').to_i
@@ -82,7 +82,7 @@ module RServiceBus2
 
     # Marshals paths for contracts
     # Note. .rb extension is optional
-    # Expected format: /one/two/Contracts
+    # Expected format: /one/two/contracts
     def load_contracts
       @contract_list = []
       # This is a guard clause in case no Contracts have been specified
@@ -90,7 +90,7 @@ module RServiceBus2
       #   to the second block
       return self if get_value('CONTRACTS').nil?
 
-      get_value('CONTRACTS', './Contract').split(';').each do |path|
+      get_value('CONTRACTS', './contract').split(';').each do |path|
         ensure_contract_file_exists(path)
         @contract_list << path
       end
@@ -99,7 +99,7 @@ module RServiceBus2
 
     # Marshals paths for lib
     # Note. .rb extension is optional
-    # Expected format: /one/two/Contracts
+    # Expected format: /one/two/contracts
     def load_libs
       @lib_list = []
 
@@ -143,9 +143,9 @@ module RServiceBus2
           puts "*** path, #{path}, does not exist"
           abort
         end
-        @handler_path_list << "#{path}/MessageHandler" if Dir.exist?("#{path}/MessageHandler")
-        @saga_path_list << "#{path}/Saga" if Dir.exist?("#{path}/Saga")
-        @contract_list << "#{path}/Contract.rb" if File.exist?( "#{path}/Contract.rb" )
+        @handler_path_list << "#{path}/messagehandler" if Dir.exist?("#{path}/messagehandler")
+        @saga_path_list << "#{path}/saga" if Dir.exist?("#{path}/saga")
+        @contract_list << "#{path}/contract.rb" if File.exist?( "#{path}/contract.rb" )
         @lib_list << "#{path}/lib" if File.exist?("#{path}/lib")
       end
       self

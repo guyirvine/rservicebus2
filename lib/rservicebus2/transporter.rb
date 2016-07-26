@@ -2,7 +2,7 @@ require 'beanstalk-client'
 require 'rservicebus2'
 require 'net/ssh/gateway'
 
-module RServiceBus
+module RServiceBus2
   class CouldNotConnectToDestination < StandardError
   end
 

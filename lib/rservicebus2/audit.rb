@@ -3,10 +3,10 @@ module RServiceBus2
   class Audit
     def initialize(mq)
       @mq = mq
-      audit_queue_name = RServiceBus.get_value('AUDIT_QUEUE_NAME')
+      audit_queue_name = RServiceBus2.get_value('AUDIT_QUEUE_NAME')
       if audit_queue_name.nil?
-        @sent_messages_to = RServiceBus.get_value('sent_messages_to')
-        @received_messages_to = RServiceBus.get_value('received_messages_to')
+        @sent_messages_to = RServiceBus2.get_value('sent_messages_to')
+        @received_messages_to = RServiceBus2.get_value('received_messages_to')
       else
         @sent_messages_to = audit_queue_name
         @received_messages_to = audit_queue_name

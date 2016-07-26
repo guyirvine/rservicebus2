@@ -1,8 +1,7 @@
-
 class MessageHandler_Msg2
-  attr_accessor :Bus
+  attr_accessor :bus
 
-  def Handle(msg)
-    @Bus.Reply(Msg3.new(msg.name + ', 3'))
+  def handle(msg)
+    @bus.reply(Msg3.new(msg.name + ', 3'))
   end
 end

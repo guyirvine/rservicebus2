@@ -1,11 +1,9 @@
-
+# MessageHandler_HelloWorld
 class MessageHandler_HelloWorld
+  attr_accessor :bus
 
-	attr_accessor :bus
-
-	def handle( msg )
-#raise "Manually generated error for testng"
-		puts 'Handling Hello World: ' + msg.name
-		@bus.reply( 'Hey. ' + msg.name )
-	end
+  def handle(msg)
+    puts 'Handling Hello World: ' + msg.name
+    @bus.reply('Hey. ' + msg.name)
+  end
 end

@@ -4,7 +4,7 @@ module RServiceBus2
     attr_reader :saga_list
 
     # Constructor
-    # @param [RServiceBus::Host] host instance
+    # @param [RServiceBus2::Host] host instance
     # @param [Hash] appResources As hash[k,v] where k is the name of a
     #   resource, and v is the resource
     def initialize(host, saga_manager)
@@ -31,7 +31,7 @@ module RServiceBus2
     # corrected.
     # @param [String] sagaName name of the saga to instantiate
     # @param [String] filePath the path to the file to be loaded
-    # @return [RServiceBus::Saga] the loader
+    # @return [RServiceBus2::Saga] the loader
     def load_saga_from_file(saga_name, file_path)
       require_path = get_require_path(file_path)
 
@@ -52,7 +52,7 @@ module RServiceBus2
     # Wrapper function
     # @param [String] filePath
     # @param [String] sagaName
-    # @returns [RServiceBus::Saga] saga
+    # @returns [RServiceBus2::Saga] saga
     def load_saga(file_path, saga_name)
       if @list_of_loaded_paths.key?(file_path)
         RServiceBus2.log "Not reloading, #{file_path}"

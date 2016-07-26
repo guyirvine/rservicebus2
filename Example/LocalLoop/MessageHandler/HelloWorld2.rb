@@ -1,9 +1,7 @@
-
 class MessageHandler_HelloWorld2
+  attr_accessor :bus
 
-	attr_accessor :bus
-
-	def handle( msg )
-		puts 'Handling Hello World2: ' + msg.name
-	end
+  def handle(msg)
+    puts 'Handling Hello World2: ' + msg.name
+  end
 end

@@ -4,6 +4,7 @@ require 'zlib'
 
 module RServiceBus2
   # Monitor Directory for files
+  # rubocop:disable Metrics/ClassLength
   class MonitorDir < Monitor
     def connect(uri)
       # Pass the path through the Dir object to check syntax on startup
@@ -81,6 +82,7 @@ module RServiceBus2
       gz.read
     end
 
+    # rubocop:disable Metrics/MethodLength
     def read_content_from_file(file_path)
       content = ''
       if @input_filter.length > 0
@@ -113,14 +115,18 @@ module RServiceBus2
 
       file_list = Dir.glob("#{@path}/*")
       file_list.each do |file_path|
-        RServiceBus.log "Ready to process, #{file_path}"
+        if File.file?(file_path) != true
+          RServiceBus2.log "Skipping directory, #{file_path}"
+          next
+        end
+        RServiceBus2.log "Ready to process, #{file_path}"
         content = process_path(file_path)
 
         unless @archivedir.nil?
           basename = File.basename(file_path)
           new_file_path = "#{@archivedir}/#{basename}.
                             #{DateTime.now.strftime('%Y%m%d%H%M%S%L')}.zip"
-          RServiceBus.log "Writing to archive, #{new_file_path}"
+          RServiceBus2.log "Writing to archive, #{new_file_path}"
 
           Zip::ZipOutputStream.open(new_file_path) do |zos|
             zos.put_next_entry(basename)
@@ -130,8 +136,8 @@ module RServiceBus2
         File.unlink(file_path)
 
         file_processed += 1
-        RServiceBus.log "Processed #{file_processed} of #{file_list.length}."
-        RServiceBus.log "Allow system tick #{self.class.name}"
+        RServiceBus2.log "Processed #{file_processed} of #{file_list.length}."
+        RServiceBus2.log "Allow system tick #{self.class.name}"
         break if file_processed >= max_files_processed
       end
     end

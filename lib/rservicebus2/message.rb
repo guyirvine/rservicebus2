@@ -44,7 +44,7 @@ module RServiceBus2
       @last_error_source_queue = source_queue
       @last_error_string = error_string
 
-      @error_list << RServiceBus::ErrorMessage.new(source_queue, error_string)
+      @error_list << RServiceBus2::ErrorMessage.new(source_queue, error_string)
     end
 
     def set_remote_host_name(host_name)

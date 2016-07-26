@@ -43,7 +43,7 @@ module RServiceBus2
 
     # Thin veneer for Configuring state
     def configure_saga_storage
-      string = RServiceBus.get_value('SAGA_URI')
+      string = RServiceBus2.get_value('SAGA_URI')
       string = 'dir:///tmp' if string.nil?
 
       uri = URI.parse(string)
@@ -119,7 +119,7 @@ module RServiceBus2
 
       @config.contract_list.each do |path|
         require path
-        RServiceBus.rlog "Loaded Contract: #{path}"
+        RServiceBus2.rlog "Loaded Contract: #{path}"
       end
 
       self
@@ -216,19 +216,19 @@ module RServiceBus2
             @stats.inc_total_processed
             @msg = YAML.load(body)
             case @msg.msg.class.name
-            when 'RServiceBus::MessageSubscription'
+            when 'RServiceBus2::MessageSubscription'
               @subscription_manager.add(@msg.msg.event_name,
                                         @msg.return_address)
-            when 'RServiceBus::MessageStatisticOutputOn'
+            when 'RServiceBus2::MessageStatisticOutputOn'
               @stats.output = true
               log 'Turn on Stats logging'
-            when 'RServiceBus::MessageStatisticOutputOff'
+            when 'RServiceBus2::MessageStatisticOutputOff'
               @stats.output = false
               log 'Turn off Stats logging'
-            when 'RServiceBus::MessageVerboseOutputOn'
+            when 'RServiceBus2::MessageVerboseOutputOn'
               ENV['VERBOSE'] = 'true'
               log 'Turn on Verbose logging'
-            when 'RServiceBus::MessageVerboseOutputOff'
+            when 'RServiceBus2::MessageVerboseOutputOff'
               ENV.delete('VERBOSE')
               log 'Turn off Verbose logging'
             else
@@ -240,7 +240,7 @@ module RServiceBus2
             @mq.ack
           rescue ClassNotFoundForMsg => e
             puts "*** Class not found for msg, #{e.message}"
-            puts "*** Ensure, #{e.message}, is defined in Contract.rb, most
+            puts "*** Ensure, #{e.message}, is defined in contract.rb, most
               likely as 'Class #{e.message} end"
 
             @msg.add_error_msg(@mq.local_queue_name, e.message)
@@ -251,7 +251,7 @@ module RServiceBus2
           rescue NoHandlerFound => e
             puts "*** Handler not found for msg, #{e.message}"
             puts "*** Ensure a handler named, #{e.message}, is present in the
-              MessageHandler directory."
+              messagehandler directory."
 
             @msg.add_error_msg(@mq.local_queue_name, e.message)
             serialized_object = YAML.dump(@msg)
@@ -338,7 +338,7 @@ module RServiceBus2
       @resource_manager.begin
       msg_name = @msg.msg.class.name
       handler_list = @handler_manager.get_handler_list_for_msg(msg_name)
-      RServiceBus.rlog 'Handler found for: ' + msg_name
+      RServiceBus2.rlog 'Handler found for: ' + msg_name
       begin
         @queue_for_msgs_to_be_sent_on_complete = []
 
@@ -376,10 +376,10 @@ module RServiceBus2
 # All msg sending Methods
 
     # Sends a msg across the bus
-    # @param [String] serialized_object serialized RServiceBus::Message
+    # @param [String] serialized_object serialized RServiceBus2::Message
     # @param [String] queue_name endpoint to which the msg will be sent
     def _send_already_wrapped_and_serialised(serialized_object, queue_name)
-      RServiceBus.rlog 'Bus._send_already_wrapped_and_serialised'
+      RServiceBus2.rlog 'Bus._send_already_wrapped_and_serialised'
 
       unless @config.forward_sent_messages_to.nil?
         @mq.send(@config.forward_sent_messages_to, serialized_object)
@@ -389,21 +389,21 @@ module RServiceBus2
     end
 
     # Sends a msg across the bus
-    # @param [RServiceBus::Message] msg msg to be sent
+    # @param [RServiceBus2::Message] msg msg to be sent
     # @param [String] queueName endpoint to which the msg will be sent
     def _send_needs_wrapping(msg, queue_name, correlation_id)
-      RServiceBus.rlog 'Bus._send_needs_wrapping'
+      RServiceBus2.rlog 'Bus._send_needs_wrapping'
 
-      r_msg = RServiceBus::Message.new(msg, @mq.local_queue_name, correlation_id)
+      r_msg = RServiceBus2::Message.new(msg, @mq.local_queue_name, correlation_id)
       if queue_name.index('@').nil?
         q = queue_name
-        RServiceBus.rlog "Sending, #{msg.class.name} to, #{queue_name}"
+        RServiceBus2.rlog "Sending, #{msg.class.name} to, #{queue_name}"
       else
         parts = queue_name.split('@')
         r_msg.set_remote_queue_name(parts[0])
         r_msg.set_remote_host_name(parts[1])
         q = 'transport-out'
-        RServiceBus.rlog "Sending, #{msg.class.name} to, #{queue_name}, via #{q}"
+        RServiceBus2.rlog "Sending, #{msg.class.name} to, #{queue_name}, via #{q}"
       end
 
       serialized_object = YAML.dump(r_msg)
@@ -429,9 +429,9 @@ module RServiceBus2
     # Sends a msg back across the bus
     # Reply queues are specified in each msg. It works like
     # email, where the reply address can actually be anywhere
-    # @param [RServiceBus::Message] msg msg to be sent
+    # @param [RServiceBus2::Message] msg msg to be sent
     def reply(msg)
-      RServiceBus.rlog 'Reply with: ' + msg.class.name + ' To: ' + @msg.return_address
+      RServiceBus2.rlog 'Reply with: ' + msg.class.name + ' To: ' + @msg.return_address
       @stats.inc_total_reply
 
       queue_msg_for_send_on_complete(msg, @msg.return_address)
@@ -451,9 +451,9 @@ module RServiceBus2
 
     # Send a msg across the bus
     # msg destination is specified at the infrastructure level
-    # @param [RServiceBus::Message] msg msg to be sent
+    # @param [RServiceBus2::Message] msg msg to be sent
     def send( msg, timestamp=nil )
-      RServiceBus.rlog 'Bus.Send'
+      RServiceBus2.rlog 'Bus.Send'
       @stats.inc_total_sent
 
       msg_name = msg.class.name
@@ -462,9 +462,9 @@ module RServiceBus2
     end
 
     # Sends an event to all subscribers across the bus
-    # @param [RServiceBus::Message] msg msg to be sent
+    # @param [RServiceBus2::Message] msg msg to be sent
     def publish(msg)
-      RServiceBus.rlog 'Bus.Publish'
+      RServiceBus2.rlog 'Bus.Publish'
       @stats.inc_total_published
 
       subscriptions = @subscription_manager.get(msg.class.name)
@@ -476,7 +476,7 @@ module RServiceBus2
     # Sends a subscription request across the Bus
     # @param [String] eventName event to be subscribes to
     def subscribe(event_name)
-      RServiceBus.rlog 'Bus.Subscribe: ' + event_name
+      RServiceBus2.rlog 'Bus.Subscribe: ' + event_name
 
       queue_name = get_endpoint_for_msg(event_name)
       subscription = MessageSubscription.new(event_name)

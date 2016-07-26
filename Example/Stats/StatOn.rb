@@ -1,9 +1,8 @@
 $:.unshift './../../lib'
-require 'rservicebus'
-require 'rservicebus/Agent'
+require 'rservicebus2'
+require 'rservicebus2/Agent'
 require './Contract'
 
-agent = RServiceBus::Agent.new.getAgent( URI.parse('beanstalk://localhost') )
+agent = RServiceBus2::Agent.new.getAgent( URI.parse('beanstalk://localhost') )
 
-agent.sendMsg(RServiceBus::Message_StatisticOutputOn.new, 'HelloWorld', 'helloResponse')
-
+agent.sendMsg(RServiceBus2::Message_StatisticOutputOn.new, 'HelloWorld', 'helloResponse')

@@ -6,7 +6,7 @@ module RServiceBus2
   class HandlerManager
     # Constructor
     #
-    # @param [RServiceBus::Host] host instance
+    # @param [RServiceBus2::Host] host instance
     # @param [Hash] app_resources As hash[k,v] where k is the name of a resource, and v is the resource
     def initialize(host, resource_manager, state_manager)
       @host = host
@@ -19,11 +19,11 @@ module RServiceBus2
 
     # setBusAttributeIfRequested
     #
-    # @param [RServiceBus::Handler] handler
+    # @param [RServiceBus2::Handler] handler
     def set_bus_attribute_if_requested(handler)
       if defined?(handler.bus)
         handler.bus = @host
-        RServiceBus.log 'Bus attribute set for: ' + handler.class.name
+        RServiceBus2.log 'Bus attribute set for: ' + handler.class.name
       end
 
       self
@@ -31,11 +31,11 @@ module RServiceBus2
 
     # setStateAttributeIfRequested
     #
-    # @param [RServiceBus::Handler] handler
+    # @param [RServiceBus2::Handler] handler
     def set_state_attribute_if_requested(handler)
       if defined?(handler.State)
         handler.State = @state_manager.get(handler)
-        RServiceBus.log 'Bus attribute set for: ' + handler.class.name
+        RServiceBus2.log 'Bus attribute set for: ' + handler.class.name
       end
 
       self
@@ -43,7 +43,7 @@ module RServiceBus2
 
     # checkIfStateAttributeRequested
     #
-    # @param [RServiceBus::Handler] handler
+    # @param [RServiceBus2::Handler] handler
     def check_if_state_attribute_requested(handler)
       @state_manager.Required if defined?(handler.state)
 
@@ -51,22 +51,23 @@ module RServiceBus2
     end
 
     def interrogate_handler_for_app_resources(handler)
-      RServiceBus.rlog "Checking app resources for: #{handler.class.name}"
-      RServiceBus.rlog "If your attribute is not getting set, check that it is in the 'attr_accessor' list"
+      RServiceBus2.rlog "Checking app resources for: #{handler.class.name}"
+      RServiceBus2.rlog "If your attribute is not getting set, check that it is in the 'attr_accessor' list"
 
       @resource_list_by_handler_name[handler.class.name] = []
       @resource_manager.get_all.each do |k, v|
         next unless handler.class.method_defined?(k)
 
         @resource_list_by_handler_name[handler.class.name] << k
-        RServiceBus.log "Resource attribute, #{k}, found for: " +
+        RServiceBus2.log "Resource attribute, #{k}, found for: " +
           handler.class.name
       end
 
       self
     end
 
-    def add_handler(msg_name, handler)
+    def add_handler(lc_msg_name, handler)
+      msg_name = lc_msg_name.gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1')
       @handler_list[msg_name] = [] if @handler_list[msg_name].nil?
       return unless @handler_list[msg_name].index{ |x| x.class.name == handler.class.name }.nil?
 
@@ -97,7 +98,7 @@ module RServiceBus2
         next if @resource_list_by_handler_name[handler.class.name].nil?
         @resource_list_by_handler_name[handler.class.name].each do |k|
           handler.instance_variable_set("@#{k}", @resource_manager.get(k).get_resource)
-          RServiceBus.rlog "App resource attribute, #{k}, set for: " + handler.class.name
+          RServiceBus2.rlog "App resource attribute, #{k}, set for: " + handler.class.name
         end
       end
     end

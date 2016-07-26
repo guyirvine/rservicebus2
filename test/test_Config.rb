@@ -37,7 +37,7 @@ class ConfigTest < Minitest::Test
     config.load_handler_path_list
 
     assert_equal 1, config.handler_path_list.length
-    assert_equal './MessageHandler', config.handler_path_list[0]
+    assert_equal './messagehandler', config.handler_path_list[0]
   end
 
   def test_load_handler_path_list_empty
@@ -47,7 +47,7 @@ class ConfigTest < Minitest::Test
     config.load_handler_path_list
 
     assert_equal 1, config.handler_path_list.length
-    assert_equal './MessageHandler', config.handler_path_list[0]
+    assert_equal './messagehandler', config.handler_path_list[0]
   end
 
   def test_load_handler_path_list_single
@@ -92,7 +92,7 @@ class ConfigTest < Minitest::Test
     assert_equal '/path2', config.handler_path_list[1]
   end
 
-  def test_loadContracts_single
+  def test_load_contracts_single
     config = TestConfig.new
 
     config.set_value('CONTRACTS', '/path')
@@ -102,7 +102,7 @@ class ConfigTest < Minitest::Test
     assert_equal '/path', config.contract_list[0]
   end
 
-  def test_loadContracts_single_with_seperator
+  def test_load_contracts_single_with_seperator
     config = TestConfig.new
 
     config.set_value('CONTRACTS', '/path;')
@@ -112,7 +112,7 @@ class ConfigTest < Minitest::Test
     assert_equal '/path', config.contract_list[0]
   end
 
-  def test_loadContracts_two
+  def test_load_contracts_two
     config = TestConfig.new
 
     config.set_value('CONTRACTS', '/path1;/path2')
