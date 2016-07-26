@@ -5,6 +5,7 @@ module RServiceBus2
   # Beanstalk client implementation.
   class MQBeanstalk < MQ
     # Connect to the broker
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def connect(host, port)
       port ||= 11_300
       string = "#{host}:#{port}"

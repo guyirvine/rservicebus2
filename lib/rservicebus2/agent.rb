@@ -22,6 +22,7 @@ module RServiceBus2
     # @param [Object] messageObj The msg to be sent
     # @param [String] queueName the name of the queue to be send the msg to
     # @param [String] returnAddress the name of a queue to send replies to
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def send_msg(message_obj, queue_name, return_address = nil)
       fail QueueNotFoundForMsg, message_obj.class.name if queue_name.nil?
 

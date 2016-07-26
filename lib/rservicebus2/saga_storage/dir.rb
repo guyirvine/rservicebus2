@@ -1,6 +1,7 @@
 module RServiceBus2
   # Saga Storage Dir
   class SagaStorageDir
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def initialize(uri)
       @saga_dir = uri.path
 

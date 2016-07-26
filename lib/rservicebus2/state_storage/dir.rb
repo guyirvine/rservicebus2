@@ -1,10 +1,11 @@
 module RServiceBus2
   # State Storage on the file system
   class StateStorageDir
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def initialize(uri)
       @state_dir = uri.path
 
-      inputdir = Dir.new(@state_dir)
+      Dir.new(@state_dir)
       unless File.writable?(@state_dir)
         puts "***** Directory is not writable, #{@state_dir}."
         puts "***** Make the directory, #{@state_dir}, writable and try

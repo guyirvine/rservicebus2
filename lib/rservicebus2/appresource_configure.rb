@@ -3,6 +3,7 @@ require 'uri'
 module RServiceBus2
   # Configure AppResources for an rservicebus host
   class ConfigureAppResource
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength,CyclomaticComplexity
     def get_resources(env, host, state_manager, saga_storage)
       # rm = resource_manager
       rm = ResourceManager.new(state_manager, saga_storage)
