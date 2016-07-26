@@ -1,136 +1,125 @@
-require 'test/unit'
-require './lib/rservicebus/Config.rb'
+require 'minitest/autorun'
+require './lib/rservicebus2/Config.rb'
 
+# TestConfig
+class TestConfig < RServiceBus2::Config
+  attr_reader :require_list
 
-class Test_Config<RServiceBus::Config
+  def initialize
+    @value_list = {}
+    @require_list = []
+  end
 
-	attr_reader :requireList
+  def get_value(name, default = nil)
+    (@value_list[name].nil? || @value_list[name] == '') ? default : @value_list[name]
+  end
 
-	def initialize
-		@valueList = Hash.new
-		@requireList = Array.new
-	end
+  def set_value(name, value)
+    @value_list[name] = value
+  end
 
-	def getValue( name, default=nil )
-		value = ( @valueList[name].nil? || @valueList[name] == '') ? default : @valueList[name];
-		return value
-	end
+  def log(_string)
+  end
 
-	def setValue( name, value )
-		@valueList[name] = value
-	end
+  def perform_require(path)
+    @require_list << path
+  end
 
-	def log(string)
-	end
-
-	def performRequire( path )
-		@requireList << path
-	end
-
-	def ensureContractFileExists( path )
-	end
-
+  def ensure_contract_file_exists(_path)
+  end
 end
 
-class ConfigTest < Test::Unit::TestCase
+# ConfigTest
+class ConfigTest < Minitest::Test
+  def test_load_handler_path_list_nil
+    config = TestConfig.new
 
-	def test_loadHandlerPathList_nil
-		config = Test_Config.new
+    config.load_handler_path_list
 
-		config.loadHandlerPathList
+    assert_equal 1, config.handler_path_list.length
+    assert_equal './MessageHandler', config.handler_path_list[0]
+  end
 
-		assert_equal 1, config.handlerPathList.length
-		assert_equal './MessageHandler', config.handlerPathList[0]
-	end
+  def test_load_handler_path_list_empty
+    config = TestConfig.new
 
-	def test_loadHandlerPathList_empty
-		config = Test_Config.new
+    config.set_value('MSGHANDLERPATH', '')
+    config.load_handler_path_list
 
-		config.setValue( 'MSGHANDLERPATH', '')
-		config.loadHandlerPathList
+    assert_equal 1, config.handler_path_list.length
+    assert_equal './MessageHandler', config.handler_path_list[0]
+  end
 
-		assert_equal 1, config.handlerPathList.length
-		assert_equal './MessageHandler', config.handlerPathList[0]
-	end
+  def test_load_handler_path_list_single
+    config = TestConfig.new
 
-	def test_loadHandlerPathList_single
-		config = Test_Config.new
+    config.set_value( 'MSGHANDLERPATH', '/path')
+    config.load_handler_path_list
 
-		config.setValue( 'MSGHANDLERPATH', '/path')
-		config.loadHandlerPathList
+    assert_equal 1, config.handler_path_list.length
+    assert_equal '/path', config.handler_path_list[0]
+  end
 
-		assert_equal 1, config.handlerPathList.length
-		assert_equal '/path', config.handlerPathList[0]
-		
-	end
+  def test_load_handler_path_list_single_with_seperator
+    config = TestConfig.new
 
-	def test_loadHandlerPathList_single_with_seperator
-		config = Test_Config.new
+    config.set_value('MSGHANDLERPATH', '/path;')
+    config.load_handler_path_list
 
-		config.setValue( 'MSGHANDLERPATH', '/path;')
-		config.loadHandlerPathList
+    assert_equal 1, config.handler_path_list.length
+    assert_equal '/path', config.handler_path_list[0]
+  end
 
-		assert_equal 1, config.handlerPathList.length
-		assert_equal '/path', config.handlerPathList[0]
+  def test_load_handler_path_list_two
+    config = TestConfig.new
 
-	end
+    config.set_value('MSGHANDLERPATH', '/path1;/path2')
+    config.load_handler_path_list
 
-	def test_loadHandlerPathList_two
-		config = Test_Config.new
+    assert_equal 2, config.handler_path_list.length
+    assert_equal '/path1', config.handler_path_list[0]
+    assert_equal '/path2', config.handler_path_list[1]
+  end
 
-		config.setValue( 'MSGHANDLERPATH', '/path1;/path2')
-		config.loadHandlerPathList
+  def test_load_handler_path_list_two_with_trailing_slash
+    config = TestConfig.new
 
-		assert_equal 2, config.handlerPathList.length
-		assert_equal '/path1', config.handlerPathList[0]
-		assert_equal '/path2', config.handlerPathList[1]
-		
-	end
+    config.set_value('MSGHANDLERPATH', '/path1/;/path2/')
+    config.load_handler_path_list
 
-	def test_loadHandlerPathList_two_with_trailing_slash
-		config = Test_Config.new
+    assert_equal 2, config.handler_path_list.length
+    assert_equal '/path1', config.handler_path_list[0]
+    assert_equal '/path2', config.handler_path_list[1]
+  end
 
-		config.setValue( 'MSGHANDLERPATH', '/path1/;/path2/')
-		config.loadHandlerPathList
+  def test_loadContracts_single
+    config = TestConfig.new
 
-		assert_equal 2, config.handlerPathList.length
-		assert_equal '/path1', config.handlerPathList[0]
-		assert_equal '/path2', config.handlerPathList[1]
-		
-	end
+    config.set_value('CONTRACTS', '/path')
+    config.load_contracts
 
-	def test_loadContracts_single
-		config = Test_Config.new
+    assert_equal 1, config.contract_list.length
+    assert_equal '/path', config.contract_list[0]
+  end
 
-		config.setValue( 'CONTRACTS', '/path')
-		config.loadContracts
+  def test_loadContracts_single_with_seperator
+    config = TestConfig.new
 
-		assert_equal 1, config.contractList.length
-		assert_equal '/path', config.contractList[0]
-		
-	end
+    config.set_value('CONTRACTS', '/path;')
+    config.load_contracts
 
-	def test_loadContracts_single_with_seperator
-		config = Test_Config.new
+    assert_equal 1, config.contract_list.length
+    assert_equal '/path', config.contract_list[0]
+  end
 
-		config.setValue( 'CONTRACTS', '/path;')
-		config.loadContracts
+  def test_loadContracts_two
+    config = TestConfig.new
 
-		assert_equal 1, config.contractList.length
-		assert_equal '/path', config.contractList[0]
+    config.set_value('CONTRACTS', '/path1;/path2')
+    config.load_contracts
 
-	end
-
-	def test_loadContracts_two
-		config = Test_Config.new
-
-		config.setValue( 'CONTRACTS', '/path1;/path2')
-		config.loadContracts
-
-		assert_equal 2, config.contractList.length
-		assert_equal '/path1', config.contractList[0]
-		assert_equal '/path2', config.contractList[1]
-		
-	end
-
+    assert_equal 2, config.contract_list.length
+    assert_equal '/path1', config.contract_list[0]
+    assert_equal '/path2', config.contract_list[1]
+  end
 end

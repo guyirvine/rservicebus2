@@ -1,154 +1,149 @@
-require 'test/unit'
+require 'minitest/autorun'
 
-require './lib/rservicebus/Saga/Base.rb'
-require './lib/rservicebus/Saga/Manager.rb'
-require './lib/rservicebus/Message.rb'
-require './lib/rservicebus/Saga/Data.rb'
-require './lib/rservicebus/ResourceManager.rb'
+require './lib/rservicebus2/saga/base.rb'
+require './lib/rservicebus2/saga/manager.rb'
+require './lib/rservicebus2/message.rb'
+require './lib/rservicebus2/saga/data.rb'
+require './lib/rservicebus2/resource_manager.rb'
 
-require 'rservicebus/SagaStorage/InMemory.rb'
-require 'rservicebus/SagaStorage/Dir.rb'
+require 'rservicebus2/saga_storage/inmemory.rb'
+require 'rservicebus2/saga_storage/dir.rb'
 
-require './lib/rservicebus/Test/Bus'
+require './lib/rservicebus2/Test/Bus'
 
+# Msg1
 class Msg1
-    attr_accessor :field1
-    
-    def initialize( field1 )
-        @field1 = field1
-    end
+  attr_accessor :field1
+
+  def initialize(field1)
+    @field1 = field1
+  end
 end
 
+# Msg2
 class Msg2
-    attr_reader :field2, :field3
-    
-    def initialize( field2, field3 )
-        @field2 = field2
-        @field3 = field3
-    end
+  attr_reader :field2, :field3
+
+  def initialize(field2, field3)
+    @field2 = field2
+    @field3 = field3
+  end
 end
 
+# Msg3
 class Msg3
-    attr_accessor :field1
-    
-    def initialize( field1 )
-        @field1 = field1
-    end
+  attr_accessor :field1
+
+  def initialize(field1)
+    @field1 = field1
+  end
 end
 
-class SagaMsg1Msg2<RServiceBus::Saga_Base
-    
-	def StartWith_Msg1( msg )
-        self.data['Bob1'] = 'John1'
-        self.data['sfield2'] = msg.field1
-	end
-	def Handle_Msg2( msg )
-        self.data['Bob1'] = msg.field2
-        self.data['Bob2'] = msg.field2
-	end
-	def Handle_Msg3( msg )
-        self.finish
-	end
+# SagaMsg1Msg2
+class SagaMsg1Msg2 < RServiceBus2::SagaBase
+  def startwith_msg1(msg)
+    @data['Bob1'] = 'John1'
+    @data['sfield2'] = msg.field1
+  end
 
+  def handle_msg2(msg)
+    @data['Bob1'] = msg.field2
+    @data['Bob2'] = msg.field2
+  end
 
+  def handle_msg3(_msg)
+    finish
+  end
 end
 
-class Saga_Manager_For_Testing<RServiceBus::Saga_Manager
-    attr_reader :correlation, :resourceManager
-
+# SagaManagerForTesting
+class SagaManagerForTesting < RServiceBus2::SagaManager
+  attr_reader :correlation, :resourceManager
 end
 
-class SagaStorage_InMemory_For_Testing<RServiceBus::SagaStorage_InMemory
-    attr_reader :hash
-    
+# SagaStorageInMemoryForTesting
+class SagaStorageInMemoryForTesting < RServiceBus2::SagaStorageInMemory
+  attr_reader :hash
 end
 
-class ResourceManager_For_Testing_Sagas<RServiceBus::ResourceManager
-    
+# ResourceManagerForTestingSagas
+class ResourceManagerForTestingSagas < RServiceBus2::ResourceManager
 end
 
+# SagaTest
+class SagaTest < Minitest::Test
+  def setup
+    @bus = RServiceBus2::TestBus.new
 
-class SagaTest < Test::Unit::TestCase
-    
-    def setup
-        @Bus = RServiceBus::Test_Bus.new
-        stateManager = nil
+    @saga_storage = SagaStorageInMemoryForTesting.new('')
+    @resource_manager = ResourceManagerForTestingSagas.new(nil, @saga_storage)
+    @saga_manager = SagaManagerForTesting.new(@bus,
+                                              @resource_manager,
+                                              @saga_storage)
+    @msg1 = RServiceBus2::Message.new(Msg1.new('One'), 'Q')
 
-        @SagaStorage = SagaStorage_InMemory_For_Testing.new('')
-        stateManager = nil
-        @ResourceManager = ResourceManager_For_Testing_Sagas.new( stateManager, @SagaStorage )
-        @sagaManager = Saga_Manager_For_Testing.new( @Bus, @ResourceManager, @SagaStorage )
-        
-        @msg1 = RServiceBus::Message.new( Msg1.new('One'), 'Q')
+    @saga_storage.begin
+  end
 
-        @SagaStorage.Begin
-    end
-    
-	def test_SagaMsgDerivation
-		assert_equal ['Msg1'], @sagaManager.GetStartWithMethodNames( SagaMsg1Msg2 )
-        
-	end
-    
-    
-    def test_StartSaga
-        @sagaManager.RegisterSaga( SagaMsg1Msg2 )
+  def test_SagaMsgDerivation
+    assert_equal ['msg1'], @saga_manager.get_start_with_method_names(SagaMsg1Msg2)
+  end
 
-        assert_equal 0, @SagaStorage.hash.keys.length
-        @sagaManager.Handle( @msg1 )
-        assert_equal 1, @SagaStorage.hash.keys.length
-        
-        data = @SagaStorage.hash[@SagaStorage.hash.keys[0]]
-        assert_equal 2, data.length
-        
-        data = @SagaStorage.hash[@SagaStorage.hash.keys[0]]
-        assert_equal 2, data.length
-        
-        assert_equal 'John1', data['Bob1']
-        assert_equal 'One', data['sfield2']
-        
-        
-    end
-    
-    def test_SagaWithFollowUpMsg
-        @sagaManager.RegisterSaga( SagaMsg1Msg2 )
+  def test_StartSaga
+    @saga_manager.register_saga(SagaMsg1Msg2)
 
-        @sagaManager.Handle( @msg1 )
-        assert_equal 1, @SagaStorage.hash.keys.length
+    assert_equal 0, @saga_storage.hash.keys.length
+    @saga_manager.handle(@msg1)
+    assert_equal 1, @saga_storage.hash.keys.length
 
+    data = @saga_storage.hash[@saga_storage.hash.keys[0]]
+    assert_equal 2, data.length
 
-        msg2 = RServiceBus::Message.new( Msg2.new( 'BB', 'AA'), 'Q', @SagaStorage.hash.keys[0] )
+    data = @saga_storage.hash[@saga_storage.hash.keys[0]]
+    assert_equal 2, data.length
 
+    assert_equal 'John1', data['Bob1']
+    assert_equal 'One', data['sfield2']
+  end
 
-        @sagaManager.Handle( msg2 )
+  def test_SagaWithFollowUpMsg
+    @saga_manager.register_saga(SagaMsg1Msg2)
 
-        data = @SagaStorage.hash[@SagaStorage.hash.keys[0]]
-        assert_equal 3, data.length
+    @saga_manager.handle(@msg1)
+    assert_equal 1, @saga_storage.hash.keys.length
 
-        assert_equal 'BB', data['Bob1']
-        assert_equal 'BB', data['Bob2']
-        assert_equal 'One', data['sfield2']
+    msg2 = RServiceBus2::Message.new(Msg2.new('BB', 'AA'),
+                                     'Q',
+                                     @saga_storage.hash.keys[0])
+    @saga_manager.handle(msg2)
 
+    data = @saga_storage.hash[@saga_storage.hash.keys[0]]
+    assert_equal 3, data.length
 
-    end
+    assert_equal 'BB', data['Bob1']
+    assert_equal 'BB', data['Bob2']
+    assert_equal 'One', data['sfield2']
+  end
 
-    def test_SagaWithFollowUpMsgAndFinish
-        @sagaManager.RegisterSaga( SagaMsg1Msg2 )
+  def test_SagaWithFollowUpMsgAndFinish
+    @saga_manager.register_saga(SagaMsg1Msg2)
 
-        @sagaManager.Handle( @msg1 )
-        assert_equal 1, @SagaStorage.hash.keys.length
+    @saga_manager.handle(@msg1)
+    assert_equal 1, @saga_storage.hash.keys.length
 
-        msg2 = RServiceBus::Message.new( Msg2.new( "BB", "AA" ), "Q", @SagaStorage.hash.keys[0] )
-        @sagaManager.Handle( msg2 )
-        assert_equal 3, @SagaStorage.hash[@SagaStorage.hash.keys[0]].length
+    msg2 = RServiceBus2::Message.new(Msg2.new('BB', 'AA'),
+                                     'Q',
+                                     @saga_storage.hash.keys[0])
+    @saga_manager.handle(msg2)
+    assert_equal 3, @saga_storage.hash[@saga_storage.hash.keys[0]].length
 
-        msg3 = RServiceBus::Message.new( Msg3.new( "CC" ), "Q", @SagaStorage.hash.keys[0] )
+    msg3 = RServiceBus2::Message.new(Msg3.new('CC'),
+                                     'Q',
+                                     @saga_storage.hash.keys[0])
 
-        @sagaManager.Handle( msg3 )
-        
-        @SagaStorage.Commit
-        assert_equal 0, @SagaStorage.hash.length
+    @saga_manager.handle(msg3)
 
-    end
-
-
+    @saga_storage.commit
+    assert_equal 1, @saga_storage.hash.length
+  end
 end

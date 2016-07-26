@@ -1,15 +1,14 @@
 #!/usr/bin/env ruby
 
-require 'rservicebus'
-require 'rservicebus/Agent'
+require 'rservicebus2'
+require 'rservicebus2/Agent'
 
-
-abort( "Usage: #{File.basename($0)} <Msg Name> <Queue Name> [Response Queue Name] [Beanstalk Host]" ) unless ARGV.length >=2 && ARGV.length <=4
+abort "Usage: #{File.basename($0)} <Msg Name> <Queue Name> [Response Queue Name] [Beanstalk Host]" unless ARGV.length >=2 && ARGV.length <=4
 msg_name = ARGV[0]
 queue_name = ARGV[1]
 response_queue_name = "#{queue_name}Response" if ARGV.length >= 3
-beanstalkHost = 'beanstalk://localhost' if ARGV.length <= 4
+beanstalk_host = 'beanstalk://localhost' if ARGV.length <= 4
 
-agent = RServiceBus::Agent.new.getAgent( URI.parse( beanstalkHost) )
-msg = RServiceBus.createAnonymousClass( msg_name )
+agent = RServiceBus2::Agent.new.getAgent(URI.parse(beanstalk_host))
+msg = RServiceBus2.createAnonymousClass(msg_name)
 agent.sendMsg(msg, queue_name, response_queue_name)

@@ -5,12 +5,11 @@
 #
 
 require 'rubygems'
-require 'rservicebus'
-require 'rservicebus/Transporter'
+require 'rservicebus2'
+require 'rservicebus2/Transporter'
 
-def run_rservicebus_transport()
-	RServiceBus::Transporter.new().Run()
+def run_rservicebus2_transport
+  RServiceBus2::Transporter.new.Run
 end
 
 run_rservicebus_transport
-

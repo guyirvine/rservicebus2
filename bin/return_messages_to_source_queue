@@ -2,7 +2,7 @@
 
 require 'yaml'
 require 'beanstalk-client'
-require 'rservicebus'
+require 'rservicebus2'
 
 def return_msg(beanstalk, job, request_nbr)
   first_match = 'ruby/object:'

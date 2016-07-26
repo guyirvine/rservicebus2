@@ -5,7 +5,7 @@
 #
 
 require 'rubygems'
-require 'rservicebus'
+require 'rservicebus2'
 require 'rservicebus/Agent'
 
 

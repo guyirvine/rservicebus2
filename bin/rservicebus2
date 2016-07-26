@@ -5,10 +5,10 @@
 #
 
 require 'rubygems'
-require 'rservicebus'
+require 'rservicebus2'
 
-def run_rservicebus()
-	RServiceBus::Host.new().run()
+def run_rservicebus
+  RServiceBus2::Host.new.run
 end
 
 run_rservicebus
