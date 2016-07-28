@@ -1,5 +1,5 @@
 require 'beanstalk-client'
-require 'rservicebus2/MQ'
+require 'rservicebus2/mq'
 
 module RServiceBus2
   # Beanstalk client implementation.

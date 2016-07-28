@@ -1,4 +1,4 @@
-require 'rservicebus2/Monitor/Dir'
+require 'rservicebus2/monitor/dir'
 require 'csv'
 
 module RServiceBus2

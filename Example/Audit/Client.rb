@@ -1,6 +1,6 @@
 $:.unshift './../../lib'
 require 'rservicebus2'
-require 'rservicebus2/Agent'
+require 'rservicebus2/agent'
 require './Contract'
 
 ENV['MESSAGE_ENDPOINT_MAPPINGS'] = 'HelloWorld:HelloWorld'

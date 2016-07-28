@@ -8,7 +8,9 @@ module RServiceBus2
       # rm = resource_manager
       rm = ResourceManager.new(state_manager, saga_storage)
       env.each do |k, v|
-        if v.is_a?(String) && k.start_with?('RSBFDB_')
+        if v.is_a?(String) &&
+           (k.start_with?('RSBFDB_') || v.index('fluiddb') == 0)
+          v = v['fluiddb'.length..-1] if v.index('fluiddb') == 0
           uri = URI.parse(v)
           require 'rservicebus2/appresource/fluiddb'
           rm.add k.sub('RSBFDB_', ''), AppResourceFluidDb.new(host, uri)

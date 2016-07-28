@@ -33,7 +33,7 @@ module RServiceBus2
       @queue_name_list << match[2]
     end
 
-    def configure(local_queue_name=nil)
+    def configure(local_queue_name = nil)
       log('EndpointMapping.Configure')
 
       @queue_name_list = []
