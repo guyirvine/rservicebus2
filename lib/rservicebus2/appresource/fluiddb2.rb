@@ -1,9 +1,10 @@
-require 'FluidDb/Db'
+require 'fluiddb2'
+
 module RServiceBus2
-  # Implementation of an AppResource - FluidDb
-  class AppResourceFluidDb < AppResource
+  # Implementation of an AppResource - FluidDb2
+  class AppResourceFluidDb2 < AppResource
     def connect(uri)
-      FluidDb::Db(uri)
+      FluidDb2.Db(uri)
     end
 
     # Transaction Semantics

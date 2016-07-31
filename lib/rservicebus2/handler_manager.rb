@@ -67,7 +67,7 @@ module RServiceBus2
     end
 
     def add_handler(lc_msg_name, handler)
-      msg_name = lc_msg_name.gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1')
+      msg_name = lc_msg_name.gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1') # Turn snake_case string to CamelCase
       @handler_list[msg_name] = [] if @handler_list[msg_name].nil?
       return unless @handler_list[msg_name].index{ |x| x.class.name == handler.class.name }.nil?
 
