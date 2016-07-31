@@ -7,17 +7,17 @@ module RServiceBus2
     end
 
     # Transaction Semantics
-    def Begin
+    def begin
       @connection.begin
     end
 
     # Transaction Semantics
-    def Commit
+    def commit
       @connection.commit
     end
 
     # Transaction Semantics
-    def Rollback
+    def rollback
       @connection.rollback
     end
   end

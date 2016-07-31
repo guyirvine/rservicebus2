@@ -4,21 +4,21 @@ module RServiceBus2
   # Implementation of an AppResource - FluidDb2
   class AppResourceFluidDb2 < AppResource
     def connect(uri)
-      FluidDb2.Db(uri)
+      FluidDb2.db(uri)
     end
 
     # Transaction Semantics
-    def Begin
+    def begin
       @connection.begin
     end
 
     # Transaction Semantics
-    def Commit
+    def commit
       @connection.commit
     end
 
     # Transaction Semantics
-    def Rollback
+    def rollback
       @connection.rollback
     end
   end
