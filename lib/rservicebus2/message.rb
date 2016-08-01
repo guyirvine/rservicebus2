@@ -7,7 +7,7 @@ module RServiceBus2
   class Message
     attr_reader :return_address, :msg_id, :remote_queue_name, :remote_host_name,
                 :last_error_source_queue, :last_error_string, :correlation_id,
-                :sendat
+                :sendat, :error_list
 
     # Constructor
     #

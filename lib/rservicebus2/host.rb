@@ -372,8 +372,8 @@ module RServiceBus2
       end
     end
 
-#######################################################################################################
-# All msg sending Methods
+    ###########################################################################
+    # All msg sending Methods
 
     # Sends a msg across the bus
     # @param [String] serialized_object serialized RServiceBus2::Message
