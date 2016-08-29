@@ -1,3 +1,4 @@
 rservicebus2-*.gem
 Example/CsvMonitor/output/*
+Example/DirMonitor/output/*
 

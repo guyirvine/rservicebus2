@@ -45,12 +45,6 @@ module RServiceBus2
           name = k.sub('RSBOB_', '')
           monitor = nil
           case uri.scheme
-          when 'csvdir'
-            require 'rservicebus2/monitor/csvdir'
-            monitor = MonitorCsvDir.new(@host, name, uri)
-          when 'xmldir'
-            require 'rservicebus2/monitor/xmldir'
-            monitor = MonitorXmlDir.new(@host, name, uri)
           when 'dir'
             require 'rservicebus2/monitor/dir'
             monitor = MonitorDir.new(@host, name, uri)
