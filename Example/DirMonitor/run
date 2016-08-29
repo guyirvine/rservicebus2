@@ -1,5 +1,7 @@
 PWD=`pwd`
 
+cp README.md ./input/
+
 APPNAME=HelloWorld \
 MAX_RETRIES=2 \
 QUEUE_TIMEOUT=1 \
