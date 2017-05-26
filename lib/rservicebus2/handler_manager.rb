@@ -33,8 +33,8 @@ module RServiceBus2
     #
     # @param [RServiceBus2::Handler] handler
     def set_state_attribute_if_requested(handler)
-      if defined?(handler.State)
-        handler.State = @state_manager.get(handler)
+      if defined?(handler.state)
+        handler.state = @state_manager.get(handler)
         RServiceBus2.log 'Bus attribute set for: ' + handler.class.name
       end
 
@@ -45,7 +45,7 @@ module RServiceBus2
     #
     # @param [RServiceBus2::Handler] handler
     def check_if_state_attribute_requested(handler)
-      @state_manager.Required if defined?(handler.state)
+      @state_manager.required if defined?(handler.state)
 
       self
     end
