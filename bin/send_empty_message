@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rservicebus2'
-require 'rservicebus2/Agent'
+require 'rservicebus2/agent'
 
 abort "Usage: #{File.basename($0)} <Msg Name> <Queue Name> [Response Queue Name] [Beanstalk Host]" unless ARGV.length >=2 && ARGV.length <=4
 msg_name = ARGV[0]
