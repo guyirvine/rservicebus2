@@ -18,6 +18,9 @@ module RServiceBus2
       when 'beanstalk'
         require 'rservicebus2/mq/beanstalk'
         mq = MQBeanstalk.new(uri)
+      when 'file'
+        require 'rservicebus2/mq/file'
+	mq = MQFile.new(uri)
       else
         abort("Scheme, #{uri.scheme}, not recognised when configuring mq,
           #{string}")

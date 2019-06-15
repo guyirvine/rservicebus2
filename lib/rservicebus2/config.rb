@@ -133,7 +133,7 @@ module RServiceBus2
     def load_working_dir_list
       puts "Config.load_working_dir_list.1"
       puts "Config.load_working_dir_list.2 #{@contract_list}"
-      path_list = get_value('WORKING_DIR')
+      path_list = get_value('WORKING_DIR', './')
       return self if path_list.nil?
 
       path_list.split(';').each do |path|

@@ -1,6 +1,6 @@
 APPNAME=MySubscriber1 \
 VERBOSE=true \
-MSGHANDLERPATH=MySubscriber1/MessageHandler \
+MSGHANDLERPATH=my_subscriber1/messagehandler \
 MESSAGE_ENDPOINT_MAPPINGS=HelloWorldEvent:MyPublisher \
 SUBSCRIPTION_URI=file:///tmp/subs \
 ../rservicebus_examples

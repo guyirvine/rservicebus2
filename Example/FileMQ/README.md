@@ -11,8 +11,6 @@ the message and sends a reply
 The client then picks up the reply
 
 ##How
-make sure beanstalk is running, then
-
 run the
   ./run
 

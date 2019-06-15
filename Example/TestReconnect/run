@@ -1,3 +1,5 @@
-APPNAME=HelloWorld MAX_RETRIES=1 VERBOSE=true RSB_Bcs=fluiddbpgsql://127.0.0.1/rservicebus_test \
- \
+APPNAME=HelloWorld \
+MAX_RETRIES=1 \
+VERBOSE=true \
+RSB_Bcs=fluiddbpgsql://127.0.0.1/rservicebus_test \
 ../rservicebus_examples

@@ -1,7 +1,6 @@
 APPNAME=HelloWorld \
 ERROR_QUEUE_NAME=error \
 MAX_RETRIES=2 \
-VERBOSE=true \
-MSGHANDLERPATH=./MessageHandler \
-CONTRACTS=./contract.rb \
+WORKING_DIR=./ \
+RSBMQ=file:///tmp/rsb2 \
 ../rservicebus_examples

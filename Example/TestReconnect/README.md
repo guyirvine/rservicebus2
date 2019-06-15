@@ -12,4 +12,4 @@ then
 run ./run in a terminal
 
 in another terminal, run
-  ruby Client.rb
+  ruby client.rb

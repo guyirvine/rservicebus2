@@ -1,0 +1,7 @@
+APPNAME=State \
+MAX_RETRIES=0 \
+VERBOSE=true \
+WORKING_DIR=./ \
+STATE_URI=dir:///tmp/rsb2/state \
+../rservicebus_examples
+
