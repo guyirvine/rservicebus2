@@ -21,6 +21,9 @@ module RServiceBus2
       when 'file'
         require 'rservicebus2/mq/file'
 	mq = MQFile.new(uri)
+      when 'redis'
+        require 'rservicebus2/mq/redis'
+	mq = MQRedis.new(uri)
       else
         abort("Scheme, #{uri.scheme}, not recognised when configuring mq,
           #{string}")
