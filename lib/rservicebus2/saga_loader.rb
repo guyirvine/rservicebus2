@@ -16,21 +16,21 @@ module RServiceBus2
     # Cleans the given path to ensure it can be used for as a parameter for the
     #  require statement.
     # @param [String] file_path the path to be cleaned
-    def get_require_path(filePath)
+    def get_require_path(file_path)
       file_path = './' + file_path unless file_path.start_with?('/')
 
       return file_path.sub('.rb', '') if File.exist?(file_path)
 
-      abort('Filepath, ' + filePath + ", given for Saga require doesn't exist")
+      abort('Filepath, ' + file_path + ", given for Saga require doesn't exist")
     end
 
-    # Instantiate the saga named in sagaName from the file name in filePath
+    # Instantiate the saga named in sagaName from the file name in file_path
     # Exceptions will be raised if encountered when loading sagas. This is a
     # load time activity, so sagas should load correctly. As much information
     # as possible is returned to enable the saga to be fixed, or configuration
     # corrected.
     # @param [String] sagaName name of the saga to instantiate
-    # @param [String] filePath the path to the file to be loaded
+    # @param [String] file_path the path to the file to be loaded
     # @return [RServiceBus2::Saga] the loader
     def load_saga_from_file(saga_name, file_path)
       require_path = get_require_path(file_path)
@@ -50,7 +50,7 @@ module RServiceBus2
     end
 
     # Wrapper function
-    # @param [String] filePath
+    # @param [String] file_path
     # @param [String] sagaName
     # @returns [RServiceBus2::Saga] saga
     def load_saga(file_path, saga_name)
@@ -97,7 +97,7 @@ module RServiceBus2
 
       saga_name = base_name.sub(ext_name, '')
 
-      "Saga_#{saga_name}"
+      "saga_#{saga_name}".gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1')
     end
 
     # Entry point for loading Sagas
@@ -106,7 +106,7 @@ module RServiceBus2
       RServiceBus2.rlog "SagaLoader.loadSagasFromPath. base_dir: #{base_dir}"
 
       get_list_of_files_for_dir(base_dir).each do |file_path|
-        unless filePath.end_with?('.')
+        unless file_path.end_with?('.')
           saga_name = get_saga_name(file_path)
           load_saga(file_path, saga_name)
         end

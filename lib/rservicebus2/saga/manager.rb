@@ -24,7 +24,7 @@ module RServiceBus2
     end
 
     def get_start_with_method_names(saga)
-      get_methods_by_prefix(saga, 'startwith_')
+      get_methods_by_prefix(saga, 'start_with_')
     end
 
     # setBusAttributeIfRequested
@@ -63,7 +63,7 @@ module RServiceBus2
         @start_with[msg_name] = [] if @start_with[msg_name].nil?
         @start_with[msg_name] << s
 
-        RServiceBus2.log "Registered, #{saga.name}, to startwith, #{msg_name}", true
+        RServiceBus2.log "Registered, #{saga.name}, to start_with, #{msg_name}", true
       end
 
       @saga[saga.name] = s
@@ -88,12 +88,13 @@ module RServiceBus2
       msg_class_name = msg.class.name.downcase
 
       RServiceBus2.log "SagaManager, started processing, #{msg_class_name}", true
-      unless @start_with[msg_class_name].nil?
+      if @start_with.key?(msg_class_name)
+#      unless @start_with[msg_class_name].nil?
         @start_with[msg_class_name].each do |saga|
           data = SagaData.new(saga)
           @saga_storage.set(data)
 
-          method_name = "startwith_#{msg_class_name}"
+          method_name = "start_with_#{msg_class_name}"
           process_msg(saga, data, method_name, msg)
 
           handled = true
@@ -102,8 +103,10 @@ module RServiceBus2
       return handled if handled == true
 
       return false if rmsg.correlation_id.nil?
+
       data = @saga_storage.get(rmsg.correlation_id)
-      return handled if data.nil?
+      return false if data.nil?
+
       method_name = "handle_#{msg_class_name}"
       saga = @saga[data.saga_class_name]
       process_msg(saga, data, method_name, msg)

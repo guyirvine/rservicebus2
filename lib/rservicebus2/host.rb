@@ -43,8 +43,8 @@ module RServiceBus2
 
     # Thin veneer for Configuring state
     def configure_saga_storage
-      string = RServiceBus2.get_value('SAGA_URI')
-      string = 'dir:///tmp' if string.nil?
+      string = RServiceBus2.get_value('SAGA_URI', 'dir:///tmp/saga')
+      # string = 'dir:///tmp' if string.nil?
 
       uri = URI.parse(string)
       @saga_storage = SagaStorage.get(uri)

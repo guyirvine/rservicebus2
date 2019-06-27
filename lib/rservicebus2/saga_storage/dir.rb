@@ -75,7 +75,7 @@ module RServiceBus2
     end
 
     def load(path)
-      return {} unless File.exist?(path)
+      return nil unless File.exist?(path)
 
       content = IO.read(path)
 
