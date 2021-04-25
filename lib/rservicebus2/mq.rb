@@ -20,10 +20,13 @@ module RServiceBus2
         mq = MQBeanstalk.new(uri)
       when 'file'
         require 'rservicebus2/mq/file'
-	mq = MQFile.new(uri)
+        mq = MQFile.new(uri)
       when 'redis'
         require 'rservicebus2/mq/redis'
-	mq = MQRedis.new(uri)
+        mq = MQRedis.new(uri)
+      when 'aws'
+        require 'rservicebus2/mq/aws'
+        mq = MQAWS.new(uri)
       else
         abort("Scheme, #{uri.scheme}, not recognised when configuring mq,
           #{string}")
