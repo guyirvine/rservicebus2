@@ -9,11 +9,13 @@ Gem::Specification.new do |s|
   s.files       = Dir["{lib}/**/*.rb", "bin/*", "LICENSE", "*.md"]
   s.homepage    = 'http://rubygems.org/gems/rservicebus2'
   s.license     = 'LGPL-3.0'
-  s.add_dependency( "uuidtools" )
-  s.add_dependency( "json" )
-  s.add_dependency( "beanstalk-client" )
-  s.add_dependency( "fluiddb" )
-  s.add_dependency( "parse-cron" )
+
+  s.add_dependency( "uuidtools", "~> 2.2.0" )
+  s.add_dependency( "json", "~> 2.5.1" )
+  s.add_dependency( "beanstalk-client", "~> 1.1.1" )
+  s.add_dependency( "fluiddb", "~> 0.1.19" )
+  s.add_dependency( "parse-cron", "~> 0.1.4" )
+
   s.executables << 'rservicebus2'
   s.executables << 'rservicebus2-init'
   s.executables << 'return_messages_to_source_queue'
