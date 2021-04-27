@@ -1,0 +1,6 @@
+APPNAME=HelloWorld \
+ERROR_QUEUE_NAME=error \
+MAX_RETRIES=0 \
+WORKING_DIR=./ \
+RSB_aws=awsdynamodb://us-east-1/ \
+../rservicebus_examples
