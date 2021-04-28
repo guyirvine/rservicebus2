@@ -1,0 +1,9 @@
+PWD=`pwd`
+
+APPNAME=HelloWorld \
+MAX_RETRIES=2 \
+QUEUE_TIMEOUT=1 \
+VERBOSE=true \
+RSBOB_HelloWorld=dir://$PWD/input?inputfilter=TAR \
+RSB_OutputDir=dir://$PWD/output \
+../rservicebus_examples

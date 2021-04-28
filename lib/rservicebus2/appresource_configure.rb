@@ -34,6 +34,9 @@ module RServiceBus2
           when 'awsdynamodb'
             require 'rservicebus2/appresource/awsdynamodb'
             rm.add k.sub('RSB_', ''), AppResourceAWSDynamoDb.new(host, uri)
+          when 'awss3'
+            require 'rservicebus2/appresource/awss3'
+            rm.add k.sub('RSB_', ''), AppResourceAWSS3.new(host, uri)
           else
             abort("Scheme, #{uri.scheme}, not recognised when configuring
                   app resource, #{k}=#{v}")

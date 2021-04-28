@@ -26,6 +26,7 @@ module RServiceBus2
     def initialize(bus, name, uri)
       @bus = bus
       new_anonymous_class = Class.new(MonitorMessage)
+      puts "name: #{name}"
       Object.const_set(name, new_anonymous_class)
       @msg_type = Object.const_get(name)
 

@@ -1,0 +1,7 @@
+PWD=`pwd`
+
+APPNAME=HelloWorld \
+MAX_RETRIES=0 \
+RSBOB_Factory=awss3://us-east-1/guystmpbucket \
+RSB_s3=awss3://us-east-1/ \
+../rservicebus_examples
