@@ -51,6 +51,9 @@ module RServiceBus2
           when 'awss3'
             require 'rservicebus2/monitor/awss3'
             monitor = MonitorAWSS3.new(@host, name, uri)
+          when 'awssqs'
+            require 'rservicebus2/monitor/awssqs'
+            monitor = MonitorAWSSQS.new(@host, name, uri)
           when 'dirnotifier'
             require 'rservicebus2/monitor/dirnotifier'
             monitor = MonitorDirNotifier.new(@host, name, uri)

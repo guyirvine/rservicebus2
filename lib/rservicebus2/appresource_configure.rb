@@ -37,6 +37,9 @@ module RServiceBus2
           when 'awss3'
             require 'rservicebus2/appresource/awss3'
             rm.add k.sub('RSB_', ''), AppResourceAWSS3.new(host, uri)
+          when 'awssqs'
+            require 'rservicebus2/appresource/awssqs'
+            rm.add k.sub('RSB_', ''), AppResourceAWSSQS.new(host, uri)
           else
             abort("Scheme, #{uri.scheme}, not recognised when configuring
                   app resource, #{k}=#{v}")

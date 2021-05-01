@@ -1,0 +1,5 @@
+APPNAME=HelloWorld \
+MAX_RETRIES=0 \
+RSBOB_Factory=awssqs://us-east-1/GuysTmpQueue \
+RSB_sqs=awssqs://us-east-1/GuysTmpQueue \
+../rservicebus_examples
