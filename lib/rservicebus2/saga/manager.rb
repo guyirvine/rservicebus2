@@ -44,7 +44,7 @@ module RServiceBus2
         is in the 'attr_accessor' list"
 
       @resource_list_by_saga_name[saga.class.name] = []
-      @resource_manager.get_all.each do |k, v|
+      @resource_manager.all.each do |k, v|
         if saga.class.method_defined?(k)
           @resource_list_by_saga_name[saga.class.name] << k
           RServiceBus2.log "Resource attribute, #{k}, found for: " +

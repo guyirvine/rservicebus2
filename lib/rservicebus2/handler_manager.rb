@@ -55,7 +55,7 @@ module RServiceBus2
       RServiceBus2.rlog "If your attribute is not getting set, check that it is in the 'attr_accessor' list"
 
       @resource_list_by_handler_name[handler.class.name] = []
-      @resource_manager.get_all.each do |k, v|
+      @resource_manager.all.each do |k, v|
         next unless handler.class.method_defined?(k)
 
         @resource_list_by_handler_name[handler.class.name] << k

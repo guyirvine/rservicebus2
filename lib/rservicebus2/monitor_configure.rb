@@ -23,7 +23,7 @@ module RServiceBus2
       RServiceBus2.rlog "Checking app resources for: #{monitor.class.name}"
       RServiceBus2.rlog "If your attribute is not getting set, check that it is
         in the 'attr_accessor' list"
-      @resource_manager.get_all.each do |k, v|
+      @resource_manager.all.each do |k, v|
         next unless monitor.class.method_defined?(k)
 
         monitor.instance_variable_set("@#{k}", v.get_resource)

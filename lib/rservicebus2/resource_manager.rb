@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Coordinate Transactions across resources, handlers, and Sagas
   class ResourceManager
@@ -13,7 +15,7 @@ module RServiceBus2
       @app_resources[name] = res
     end
 
-    def get_all
+    def all
       @app_resources
     end
 
@@ -37,9 +39,8 @@ module RServiceBus2
     def commit(msg_name)
       @state_manager.commit
       @saga_storage.commit
-      RServiceBus2.rlog "HandlerManager.commitResourcesUsedToProcessMsg,
-        #{msg_name}"
-      @current_resources.each do |k, v|
+      RServiceBus2.rlog "HandlerManager.commitResourcesUsedToProcessMsg, #{msg_name}"
+      @current_resources.each do |_k, v|
         RServiceBus2.rlog "Commit resource, #{v.class.name}"
         v.commit
         v.finished
@@ -48,21 +49,15 @@ module RServiceBus2
 
     def rollback(msg_name)
       @saga_storage.rollback
-      RServiceBus2.rlog "HandlerManager.rollbackResourcesUsedToProcessMsg,
-        #{msg_name}"
-      @current_resources.each do |k, v|
-        begin
-          RServiceBus2.rlog "Rollback resource, #{v.class.name}"
-          v.rollback
-          v.finished
-        rescue StandardError => e1
-          puts "Caught nested exception rolling back, #{v.class.name}, for msg,
-            #{msg_name}"
-          puts '****'
-          puts e1.message
-          puts e1.backtrace
-          puts '****'
-        end
+      RServiceBus2.rlog "HandlerManager.rollbackResourcesUsedToProcessMsg, #{msg_name}"
+      @current_resources.each do |_k, v|
+        RServiceBus2.rlog "Rollback resource, #{v.class.name}"
+        v.rollback
+        v.finished
+      rescue StandardError => e
+        puts "Caught nested exception rolling back, #{v.class.name}, for msg,
+          #{msg_name}"
+        puts "****\n#{e.message}\n#{e.backtrace}\n'****"
       end
     end
   end
