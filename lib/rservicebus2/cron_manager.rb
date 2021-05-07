@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'parse-cron'
 
 module RServiceBus2
@@ -27,7 +29,8 @@ module RServiceBus2
       @msg_names.each do |n|
         list << n if Globber.new(name) =~ n
       end
-      fail NoMatchingMsgForCron, name if list.length == 0
+      raise NoMatchingMsgForCron, name if list.empty?
+
       list
     end
 
@@ -44,6 +47,7 @@ module RServiceBus2
       end
     end
 
+    # rubocop:disable Metrics/MethodLength
     def initialize(host, msg_names = [])
       @bus = host
       @msg_names = msg_names
@@ -61,6 +65,7 @@ module RServiceBus2
         end
       end
     end
+    # rubocop:enable Metrics/MethodLength
 
     def run
       now = Time.now
