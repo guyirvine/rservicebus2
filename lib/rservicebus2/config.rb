@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Marshals configuration information for an rservicebus host
   class Config
@@ -19,7 +21,7 @@ module RServiceBus2
     end
 
     def get_value(name, default = nil)
-      value = (ENV[name].nil? || ENV[name] == '') ? default : ENV[name]
+      value = ENV[name].nil? || ENV[name] == '' ? default : ENV[name]
       log "Env value: #{name}: #{value}"
       value
     end
@@ -131,21 +133,19 @@ module RServiceBus2
     # Note. trailing slashs will be stripped
     # Expected format: <path 1>;<path 2>
     def load_working_dir_list
-      puts "Config.load_working_dir_list.1"
-      puts "Config.load_working_dir_list.2 #{@contract_list}"
       path_list = get_value('WORKING_DIR', './')
       return self if path_list.nil?
 
       path_list.split(';').each do |path|
         path = path.strip.chomp('/')
-        unless Dir.exist?("#{path}")
+        unless Dir.exist?(path.to_s)
           puts 'Error while processing working directory list'
           puts "*** path, #{path}, does not exist"
           abort
         end
         @handler_path_list << "#{path}/messagehandler" if Dir.exist?("#{path}/messagehandler")
         @saga_path_list << "#{path}/saga" if Dir.exist?("#{path}/saga")
-        @contract_list << "#{path}/contract.rb" if File.exist?( "#{path}/contract.rb" )
+        @contract_list << "#{path}/contract.rb" if File.exist?("#{path}/contract.rb")
         @lib_list << "#{path}/lib" if File.exist?("#{path}/lib")
       end
       self
@@ -154,14 +154,11 @@ module RServiceBus2
 
   # Class
   class ConfigFromEnv < Config
-    def initialize
-    end
   end
 
   # Class
   class ConfigFromSetter < Config
-    attr_writer :appName, :messageEndpointMappings, :handler_path_list, :errorQueueName, :maxRetries, :forward_received_messages_to, :beanstalkHost
-    def initialize
-    end
+    attr_writer :app_name, :message_endpoint_mappings, :handler_path_list, :error_queue_name, \
+                :max_retries, :forward_received_messages_to, :beanstalk_host
   end
 end
