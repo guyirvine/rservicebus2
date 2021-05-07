@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Given a directory, this class is responsible for finding
   #  msgnames,
@@ -20,10 +22,10 @@ module RServiceBus2
     # setBusAttributeIfRequested
     #
     # @param [RServiceBus2::Handler] handler
-    def set_bus_attribute_if_requested(handler)
+    def conditionally_set_bus_attribute(handler)
       if defined?(handler.bus)
         handler.bus = @host
-        RServiceBus2.log 'Bus attribute set for: ' + handler.class.name
+        RServiceBus2.log "Bus attribute set for: #{handler.class.name}"
       end
 
       self
@@ -32,10 +34,10 @@ module RServiceBus2
     # setStateAttributeIfRequested
     #
     # @param [RServiceBus2::Handler] handler
-    def set_state_attribute_if_requested(handler)
+    def conditionally_set_state_attribute(handler)
       if defined?(handler.state)
         handler.state = @state_manager.get(handler)
-        RServiceBus2.log 'Bus attribute set for: ' + handler.class.name
+        RServiceBus2.log "Bus attribute set for: #{handler.class.name}"
       end
 
       self
@@ -50,29 +52,29 @@ module RServiceBus2
       self
     end
 
+    # rubocop:disable Metrics/AbcSize
     def interrogate_handler_for_app_resources(handler)
-      RServiceBus2.rlog "Checking app resources for: #{handler.class.name}"
-      RServiceBus2.rlog "If your attribute is not getting set, check that it is in the 'attr_accessor' list"
+      RServiceBus2.rlog "Checking app resources for: #{handler.class.name}\n" \
+                        "If your attribute is not getting set, check that it is in the 'attr_accessor' list"
 
       @resource_list_by_handler_name[handler.class.name] = []
-      @resource_manager.all.each do |k, v|
+      @resource_manager.all.each do |k, _v|
         next unless handler.class.method_defined?(k)
 
         @resource_list_by_handler_name[handler.class.name] << k
-        RServiceBus2.log "Resource attribute, #{k}, found for: " +
-          handler.class.name
+        RServiceBus2.log "Resource attribute, #{k}, found for: #{handler.class.name}"
       end
-
-      self
     end
+    # rubocop:enable Metrics/AbcSize
 
     def add_handler(lc_msg_name, handler)
-      msg_name = lc_msg_name.gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1') # Turn snake_case string to CamelCase
+      # Turn snake_case string to CamelCase
+      msg_name = lc_msg_name.gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
       @handler_list[msg_name] = [] if @handler_list[msg_name].nil?
-      return unless @handler_list[msg_name].index{ |x| x.class.name == handler.class.name }.nil?
+      return unless @handler_list[msg_name].index { |x| x.instance_of(handler) }.nil?
 
       @handler_list[msg_name] << handler
-      set_bus_attribute_if_requested(handler)
+      conditionally_set_bus_attribute(handler)
       check_if_state_attribute_requested(handler)
       interrogate_handler_for_app_resources(handler)
     end
@@ -86,28 +88,32 @@ module RServiceBus2
 
       list = []
       @handler_list[msg_name].each do |handler|
-        list = list + @resource_list_by_handler_name[handler.class.name] unless @resource_list_by_handler_name[handler.class.name].nil?
+        unless @resource_list_by_handler_name[handler.class.name].nil?
+          list += @resource_list_by_handler_name[handler.class.name]
+        end
       end
       list.uniq!
     end
 
-    def set_resources_for_handlers_needed_to_process_msg(msg_name)
+    # rubocop:disable Metrics/AbcSize
+    def conditionally_set_resources_for_handlers(msg_name)
       @handler_list[msg_name].each do |handler|
-        set_state_attribute_if_requested(handler)
-
+        conditionally_set_state_attribute(handler)
         next if @resource_list_by_handler_name[handler.class.name].nil?
+
         @resource_list_by_handler_name[handler.class.name].each do |k|
           handler.instance_variable_set("@#{k}", @resource_manager.get(k).get_resource)
-          RServiceBus2.rlog "App resource attribute, #{k}, set for: " + handler.class.name
+          RServiceBus2.rlog "App resource attribute, #{k}, set for: #{handler.class.name}"
         end
       end
     end
+    # rubocop:enable Metrics/AbcSize
 
     def get_handler_list_for_msg(msg_name)
       return [] if @handler_list[msg_name].nil?
 
-      list = get_list_of_resources_needed_to_process_msg(msg_name)
-      set_resources_for_handlers_needed_to_process_msg(msg_name)
+      # list = get_list_of_resources_needed_to_process_msg(msg_name)
+      conditionally_set_resources_for_handlers(msg_name)
 
       @handler_list[msg_name]
     end
@@ -116,16 +122,16 @@ module RServiceBus2
       @handler_list.key?(msg_name)
     end
 
-    def get_stats
+    def stats
       list = []
-      @handler_list.each do |k, v|
+      @handler_list.each do |_k, v|
         list << v.inspect
       end
 
       list
     end
 
-    def get_list_of_msg_names
+    def msg_names
       @handler_list.keys
     end
   end
