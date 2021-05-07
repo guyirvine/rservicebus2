@@ -1,5 +1,6 @@
-module RServiceBus2
+# frozen_string_literal: true
 
+module RServiceBus2
   # Error Message
   class ErrorMessage
     attr_reader :occurredat, :source_queue, :error_msg
