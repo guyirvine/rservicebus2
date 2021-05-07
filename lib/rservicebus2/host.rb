@@ -109,7 +109,7 @@ module RServiceBus2
 
     # Thin veneer for Configuring Cron
     def configure_cron_manager
-      @cron_manager = CronManager.new(self, @handler_manager.get_list_of_msg_names)
+      @cron_manager = CronManager.new(self, @handler_manager.msg_names)
       self
     end
 
