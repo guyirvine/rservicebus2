@@ -74,7 +74,7 @@ module RServiceBus2
     def send_subscriptions
       log 'Send Subscriptions'
 
-      @endpoint_mapping.get_subscription_endpoints.each do |event_name|
+      @endpoint_mapping.subscription_endpoints.each do |event_name|
         subscribe(event_name)
       end
 
