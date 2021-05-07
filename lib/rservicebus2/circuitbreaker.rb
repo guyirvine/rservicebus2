@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   class MessageArrivedWhileCricuitBroken < StandardError
   end
@@ -42,7 +44,7 @@ module RServiceBus2
       message_arrived
 
       ## logFirstFailure
-      if @number_of_failures == 0
+      if @number_of_failures.zero?
         @number_of_failures = 1
         @time_of_first_failure = Time.now
         @time_to_break = @time_of_first_failure + @seconds_to_break
@@ -68,7 +70,7 @@ module RServiceBus2
     def message_arrived
       reset if !@time_to_break.nil? && Time.now > @time_to_break
 
-      fail MessageArrivedWhileCricuitBroken if @broken == true
+      raise MessageArrivedWhileCricuitBroken if @broken == true
     end
 
     def break_circuit
