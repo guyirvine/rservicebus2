@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module RServiceBus2
@@ -8,7 +10,7 @@ module RServiceBus2
 
     # The method which actually connects to the resource.
     def connect(_uri)
-      fail 'Method, connect, needs to be implemented for resource'
+      raise 'Method, connect, needs to be implemented for resource'
     end
 
     def _connect
@@ -44,22 +46,19 @@ module RServiceBus2
       rescue StandardError => e
         puts '** AppResource. An error was raised while closing connection
               to, ' + @uri
-        puts 'Message: ' + e.message
+        puts "Message: #{e.message}"
         puts e.backtrace
       end
       _connect
     end
 
     # Transaction Semantics
-    def begin
-    end
+    def begin; end
 
     # Transaction Semantics
-    def commit
-    end
+    def commit; end
 
     # Transaction Semantics
-    def rollback
-    end
+    def rollback; end
   end
 end
