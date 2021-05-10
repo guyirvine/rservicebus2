@@ -30,19 +30,6 @@ module RServiceBus2
                                                              self,
                                                              @state_manager,
                                                              @saga_storage)
-      self
-    end
-
-    # Thin veneer for Configuring SendAt
-    def configure_send_at_manager
-      @send_at_manager = SendAtManager.new(self)
-      self
-    end
-
-    # Thin veneer for Configuring state
-    def configure_state_manager
-      @state_manager = StateManager.new
-      self
     end
 
     # Thin veneer for Configuring state
@@ -52,25 +39,6 @@ module RServiceBus2
 
       uri = URI.parse(string)
       @saga_storage = SagaStorage.get(uri)
-      self
-    end
-
-    # Thin veneer for Configuring Cron
-    def configure_circuit_breaker
-      @circuit_breaker = CircuitBreaker.new(self)
-      self
-    end
-
-    # Thin veneer for Configuring external resources
-    def configure_monitors
-      @monitors = ConfigureMonitor.new(self, @resource_manager).get_monitors(ENV)
-      self
-    end
-
-    # Thin veneer for Configuring the Message Queue
-    def connect_to_mq
-      @mq = MQ.get
-      self
     end
 
     # Subscriptions are specified by adding events to the
@@ -81,8 +49,6 @@ module RServiceBus2
       @endpoint_mapping.subscription_endpoints.each do |event_name|
         subscribe(event_name)
       end
-
-      self
     end
 
     # Load and configure Message Handlers
@@ -94,8 +60,6 @@ module RServiceBus2
       @config.handler_path_list.each do |path|
         @handler_loader.load_handlers_from_path(path)
       end
-
-      self
     end
 
     # Load and configure Sagas
@@ -107,14 +71,6 @@ module RServiceBus2
       @config.saga_path_list.each do |path|
         @saga_loader.load_sagas_from_path(path)
       end
-
-      self
-    end
-
-    # Thin veneer for Configuring Cron
-    def configure_cron_manager
-      @cron_manager = CronManager.new(self, @handler_manager.msg_names)
-      self
     end
 
     # Load Contracts
@@ -125,8 +81,6 @@ module RServiceBus2
         require path
         RServiceBus2.rlog "Loaded Contract: #{path}"
       end
-
-      self
     end
 
     # For each directory given, find and load all librarys
@@ -135,21 +89,12 @@ module RServiceBus2
       @config.lib_list.each do |path|
         $LOAD_PATH.unshift path
       end
-
-      self
     end
 
     # Load, configure and initialise Subscriptions
     def configure_subscriptions
       subscription_storage = ConfigureSubscriptionStorage.new.get(@config.app_name, @config.subscription_uri)
       @subscription_manager = SubscriptionManager.new(subscription_storage)
-      self
-    end
-
-    # Initialise statistics monitor
-    def configure_statistics
-      @stats = StatisticManager.new(self)
-      self
     end
 
     def initialize
@@ -162,26 +107,24 @@ module RServiceBus2
                              .load_libs
                              .load_working_dir_list
 
-      connect_to_mq
+      @mq = MQ.get
 
       @endpoint_mapping = EndpointMapping.new.configure(@mq.local_queue_name)
 
-      self.configure_statistics
-          .load_contracts
-          .load_libs
-          .configure_send_at_manager
-          .configure_state_manager
-          .configure_saga_storage
-          .configure_app_resource
-          .configure_circuit_breaker
-          .configure_monitors
-          .load_handlers
-          .load_sagas
-          .configure_cron_manager
-          .configure_subscriptions
-          .send_subscriptions
-
-      self
+      @stats = StatisticManager.new(self)
+      load_contracts
+      load_libs
+      @send_at_manager = SendAtManager.new(self)
+      @state_manager = StateManager.new
+      configure_saga_storage
+      configure_app_resource
+      @circuit_breaker = CircuitBreaker.new(self)
+      @monitors = ConfigureMonitor.new(self, @resource_manager).get_monitors(ENV)
+      load_handlers
+      load_sagas
+      @cron_manager = CronManager.new(self, @handler_manager.msg_names)
+      configure_subscriptions
+      send_subscriptions
     end
 
     # Ignition
