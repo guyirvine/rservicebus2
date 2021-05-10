@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rservicebus2/sendat_storage'
 
 module RServiceBus2
