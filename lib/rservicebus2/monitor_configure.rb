@@ -26,7 +26,7 @@ module RServiceBus2
       @resource_manager.all.each do |k, v|
         next unless monitor.class.method_defined?(k)
 
-        monitor.instance_variable_set("@#{k}", v.get_resource)
+        monitor.instance_variable_set("@#{k}", v.resource)
         @resource_list[monitor.class.name] = [] if
           @resource_list[monitor.class.name].nil?
         @resource_list[monitor.class.name] << v

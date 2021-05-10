@@ -18,7 +18,7 @@ module RServiceBus2
       RServiceBus2.rlog "#{self.class.name}. Connected to, #{@uri}"
     end
 
-    def get_resource
+    def resource
       @connection
     end
 

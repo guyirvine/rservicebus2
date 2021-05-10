@@ -50,7 +50,7 @@ module RServiceBus2
     def check_for_reply(queue_name)
       @mq.subscribe(queue_name)
       body = @mq.pop
-      @msg = YAML.safe_load(body)
+      @msg = YAML.load(body)
       @mq.ack
       @msg.msg
     end

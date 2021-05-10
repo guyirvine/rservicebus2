@@ -1,3 +1,6 @@
+# frozen_string_literal: true
+
+# Helper functions
 module RServiceBus2
   def self.convert_dto_to_hash(obj)
     hash = {}
@@ -35,7 +38,7 @@ module RServiceBus2
   end
 
   def self.get_value(name, default = nil)
-    value = (ENV[name].nil? || ENV[name] == '') ? default : ENV[name]
+    value = ENV[name].nil? || ENV[name] == '' ? default : ENV[name]
     log "Env value: #{name}: #{value}"
     value
   end
@@ -50,7 +53,6 @@ module RServiceBus2
     agent = RServiceBus2::Agent.new
     Audit.new(agent).audit_to_queue(msg)
     agent.send_msg(msg, queue_name, response_queue)
-
   rescue QueueNotFoundForMsg => e
     msg = "\n"
     msg = "#{msg}*** Queue not found for, #{e.message}\n"
@@ -76,10 +78,12 @@ module RServiceBus2
 
   def self.check_environment_variable(string)
     return false if ENV[string].nil?
+    return false if ENV[string] == ''
     return true if ENV[string] == true || ENV[string] =~ (/(true|t|yes|y|1)$/i)
     return false if ENV[string] == false ||
                     ENV[string].nil? ||
                     ENV[string] =~ (/(false|f|no|n|0)$/i)
-    fail ArgumentError, "invalid value for Environment Variable: \"#{string}\""
+
+    raise ArgumentError, "invalid value for Environment Variable: \"#{string}\""
   end
 end

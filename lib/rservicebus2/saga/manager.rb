@@ -76,7 +76,7 @@ module RServiceBus2
       return if @resource_list_by_saga_name[saga.class.name].nil?
 
       @resource_list_by_saga_name[saga.class.name].each do |k, v|
-        saga.instance_variable_set("@#{k}", @resource_manager.get(k).get_resource)
+        saga.instance_variable_set("@#{k}", @resource_manager.get(k).resource)
         RServiceBus2.rlog "App resource attribute, #{k}, set for: " + saga.class.name
       end
     end

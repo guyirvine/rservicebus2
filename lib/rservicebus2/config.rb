@@ -154,11 +154,14 @@ module RServiceBus2
 
   # Class
   class ConfigFromEnv < Config
+    def initialize; end;
   end
 
   # Class
   class ConfigFromSetter < Config
     attr_writer :app_name, :message_endpoint_mappings, :handler_path_list, :error_queue_name, \
                 :max_retries, :forward_received_messages_to, :beanstalk_host
+
+    def initialize; end;
   end
 end

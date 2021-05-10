@@ -16,7 +16,8 @@ module RServiceBus2
     # @param [String] string Log entry
     # @param [Boolean] ver Indicator for a verbose log entry
     def log(string, ver = false)
-      RServiceBus2.log(string, ver)
+#      RServiceBus2.log(string, ver)
+      RServiceBus2.log(string, true)
     end
 
     # Thin veneer for Configuring external resources
