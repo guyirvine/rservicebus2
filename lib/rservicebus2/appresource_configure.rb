@@ -1,12 +1,14 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module RServiceBus2
   # Configure AppResources for an rservicebus host
   class ConfigureAppResource
-    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength,CyclomaticComplexity
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength,Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
     def get_resources(env, host, state_manager, saga_storage)
-      # rm = resource_manager
       rm = ResourceManager.new(state_manager, saga_storage)
+      # rubocop:disable Metrics/BlockLength
       env.each do |k, v|
         if v.is_a?(String) && k.start_with?('RSBFDB2_')
           uri = URI.parse(v)
@@ -15,8 +17,8 @@ module RServiceBus2
           k = k.sub('RSBFDB2_', '')
           rm.add k, AppResourceFluidDb2.new(host, uri)
         elsif v.is_a?(String) &&
-              (k.start_with?('RSBFDB_') || v.index('fluiddb') == 0)
-          v = v['fluiddb'.length..-1] if v.index('fluiddb') == 0
+              (k.start_with?('RSBFDB_') || v.index('fluiddb').zero?)
+          v = v['fluiddb'.length..-1] if v.index('fluiddb').zero?
           uri = URI.parse(v)
           require 'rservicebus2/appresource/fluiddb'
 
@@ -46,8 +48,10 @@ module RServiceBus2
           end
         end
       end
+      # rubocop:enable Metrics/BlockLength
 
       rm
     end
+    # rubocop:enable Metrics/AbcSize,Metrics/MethodLength,Metrics/CyclomaticComplexity,Metrics/PerceivedComplexity
   end
 end
