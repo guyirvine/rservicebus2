@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   class QueueNotFoundForMsg < StandardError
   end
@@ -22,9 +24,9 @@ module RServiceBus2
     # @param [Object] messageObj The msg to be sent
     # @param [String] queueName the name of the queue to be send the msg to
     # @param [String] returnAddress the name of a queue to send replies to
-    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
+    # rubocop:disable Metrics/MethodLength
     def send_msg(message_obj, queue_name, return_address = nil)
-      fail QueueNotFoundForMsg, message_obj.class.name if queue_name.nil?
+      raise QueueNotFoundForMsg, message_obj.class.name if queue_name.nil?
 
       msg = RServiceBus2::Message.new(message_obj, return_address)
       if queue_name.index('@').nil?
@@ -40,6 +42,7 @@ module RServiceBus2
 
       @mq.send(q, serialized_object)
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Gives an agent the means to receive a reply
     #
@@ -47,7 +50,7 @@ module RServiceBus2
     def check_for_reply(queue_name)
       @mq.subscribe(queue_name)
       body = @mq.pop
-      @msg = YAML.load(body)
+      @msg = YAML.safe_load(body)
       @mq.ack
       @msg.msg
     end
