@@ -133,10 +133,10 @@ module RServiceBus2
       log "Watching, #{@mq.local_queue_name}"
       $0 = "rservicebus - #{@mq.local_queue_name}"
       unless @config.forward_received_messages_to.nil?
-        log 'Forwarding all received messages to: ' + @config.forward_received_messages_to.to_s
+        log "Forwarding all received messages to: #{@config.forward_received_messages_to}"
       end
       unless @config.forward_sent_messages_to.nil?
-        log 'Forwarding all sent messages to: ' + @config.forward_sent_messages_to.to_s
+        log "Forwarding all sent messages to: #{@config.forward_sent_messages_to}"
       end
 
       start_listening_to_endpoints
@@ -206,7 +206,6 @@ module RServiceBus2
             _send_already_wrapped_and_serialised(serialized_object,
                                                  @config.error_queue_name)
             @mq.ack
-
           rescue PropertyNotSet => e
             # This has been re-rasied from a rescue in the handler
             puts "*** #{e.message}"
@@ -214,7 +213,6 @@ module RServiceBus2
             property_name = e.message[10, e.message.index(',', 10) - 10]
             puts "*** Ensure the environment variable, RSB_#{property_name},
               has been set at startup."
-
           rescue StandardError => e
             sleep 0.5
 
@@ -223,7 +221,7 @@ module RServiceBus2
             puts e.backtrace
             puts '***'
 
-            if retries > 0
+            if retries.positive?
               retries -= 1
               @mq.return_to_queue
             else
@@ -241,7 +239,7 @@ module RServiceBus2
                 abort
               end
 
-              error_string = e.message + '. ' + e.backtrace.join('. ')
+              error_string = "#{e.message}. #{e.backtrace.join('. ')}"
               @msg.add_error_msg(@mq.local_queue_name, error_string)
               serialized_object = YAML.dump(@msg)
               _send_already_wrapped_and_serialised(serialized_object, @config.error_queue_name)
@@ -266,7 +264,6 @@ module RServiceBus2
 
           @send_at_manager.process
           @circuit_breaker.success
-
         rescue StandardError => e
           if e.message == 'SIGTERM' || e.message == 'SIGINT'
             puts 'Exiting on request ...'
@@ -274,7 +271,7 @@ module RServiceBus2
           else
             puts '*** This is really unexpected.'
             message_loop = false
-            puts 'Message: ' + e.message
+            puts "Message: #{e.message}"
             puts e.backtrace
           end
         end
@@ -286,33 +283,29 @@ module RServiceBus2
       @resource_manager.begin
       msg_name = @msg.msg.class.name
       handler_list = @handler_manager.get_handler_list_for_msg(msg_name)
-      RServiceBus2.rlog 'Handler found for: ' + msg_name
+      RServiceBus2.rlog "Handler found for: #{msg_name}"
       begin
         @queue_for_msgs_to_be_sent_on_complete = []
 
         log "Started processing msg, #{msg_name}"
         handler_list.each do |handler|
-          begin
-            log "Handler, #{handler.class.name}, Started"
-            handler.handle(@msg.msg)
-            log "Handler, #{handler.class.name}, Finished"
-          rescue PropertyNotSet => e
-            raise PropertyNotSet.new( "Property, #{e.message}, not set for, #{handler.class.name}" )
-          rescue StandardError => e
-            puts "E #{e.message}"
-            log 'An error occurred in Handler: ' + handler.class.name
-            raise e
-          end
+          log "Handler, #{handler.class.name}, Started"
+          handler.handle(@msg.msg)
+          log "Handler, #{handler.class.name}, Finished"
+        rescue PropertyNotSet => e
+          raise PropertyNotSet, "Property, #{e.message}, not set for, #{handler.class.name}"
+        rescue StandardError => e
+          puts "E #{e.message}"
+          log "An error occurred in Handler: #{handler.class.name}"
+          raise e
         end
 
-        if @saga_manager.handle(@msg) == false && handler_list.length == 0
-          fail NoHandlerFound, msg_name
-        end
+        raise NoHandlerFound, msg_name if @saga_manager.handle(@msg) == false && handler_list.length.zero?
+
         @resource_manager.commit(msg_name)
 
         send_queued_msgs
         log "Finished processing msg, #{msg_name}"
-
       rescue StandardError => e
         @resource_manager.rollback(msg_name)
         @queue_for_msgs_to_be_sent_on_complete = nil
@@ -329,9 +322,7 @@ module RServiceBus2
     def _send_already_wrapped_and_serialised(serialized_object, queue_name)
       RServiceBus2.rlog 'Bus._send_already_wrapped_and_serialised'
 
-      unless @config.forward_sent_messages_to.nil?
-        @mq.send(@config.forward_sent_messages_to, serialized_object)
-      end
+      @mq.send(@config.forward_sent_messages_to, serialized_object) unless @config.forward_sent_messages_to.nil?
 
       @mq.send(queue_name, serialized_object)
     end
@@ -370,8 +361,9 @@ module RServiceBus2
 
     def queue_msg_for_send_on_complete(msg, queue_name, timestamp = nil)
       correlation_id = @saga_data.nil? ? nil : @saga_data.correlation_id
-      correlation_id = (!@msg.nil? && !@msg.correlation_id.nil?) ? @msg.correlation_id : correlation_id
-      @queue_for_msgs_to_be_sent_on_complete << Hash['msg', msg, 'queue_name', queue_name, 'correlation_id', correlation_id, 'timestamp',timestamp ]
+      correlation_id = !@msg.nil? && !@msg.correlation_id.nil? ? @msg.correlation_id : correlation_id
+      @queue_for_msgs_to_be_sent_on_complete <<
+        Hash['msg', msg, 'queue_name', queue_name, 'correlation_id', correlation_id, 'timestamp', timestamp]
     end
 
     # Sends a msg back across the bus
@@ -379,7 +371,7 @@ module RServiceBus2
     # email, where the reply address can actually be anywhere
     # @param [RServiceBus2::Message] msg msg to be sent
     def reply(msg)
-      RServiceBus2.rlog 'Reply with: ' + msg.class.name + ' To: ' + @msg.return_address
+      RServiceBus2.rlog "Reply with: #{msg.class.name} To: #{@msg.return_address}"
       @stats.inc_total_reply
 
       queue_msg_for_send_on_complete(msg, @msg.return_address)
@@ -391,21 +383,20 @@ module RServiceBus2
 
       return @mq.local_queue_name if @handler_manager.can_msg_be_handled_locally(msg_name)
 
-      log 'No end point mapping found for: ' + msg_name
-      log '**** Check environment variable MessageEndpointMappings contains an entry named : ' + msg_name
-      raise 'No end point mapping found for: ' + msg_name
+      log "No end point mapping found for: #{msg_name}"
+      log "**** Check environment variable MessageEndpointMappings contains an entry named: #{msg_name}"
+      raise "No end point mapping found for: #{msg_name}"
     end
-
 
     # Send a msg across the bus
     # msg destination is specified at the infrastructure level
     # @param [RServiceBus2::Message] msg msg to be sent
-    def send( msg, timestamp=nil )
+    def send(msg, timestamp = nil)
       RServiceBus2.rlog 'Bus.Send'
       @stats.inc_total_sent
 
       msg_name = msg.class.name
-      queue_name = self.get_endpoint_for_msg(msg_name)
+      queue_name = get_endpoint_for_msg(msg_name)
       queue_msg_for_send_on_complete(msg, queue_name, timestamp)
     end
 
@@ -424,7 +415,7 @@ module RServiceBus2
     # Sends a subscription request across the Bus
     # @param [String] eventName event to be subscribes to
     def subscribe(event_name)
-      RServiceBus2.rlog 'Bus.Subscribe: ' + event_name
+      RServiceBus2.rlog "Bus.Subscribe: #{event_name}"
 
       queue_name = get_endpoint_for_msg(event_name)
       subscription = MessageSubscription.new(event_name)
