@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'rservicebus2/state_storage'
 
 module RServiceBus2
-
   # State Manager
   class StateManager
     def required

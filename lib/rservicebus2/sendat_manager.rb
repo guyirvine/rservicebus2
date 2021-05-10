@@ -18,9 +18,9 @@ module RServiceBus2
     end
 
     def process
-      now = DateTime.now
-      @sendat_storage.get_all.each_with_index do |row, idx|
-        next if row['timestamp'] <= now
+      now = Time.now
+      @sendat_storage.all.each_with_index do |row, idx|
+        next if now <= row['timestamp']
 
         @bus._send_needs_wrapping(row['msg'], row['queue_name'],
                                   row['correlation_id'])

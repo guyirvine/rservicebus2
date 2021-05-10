@@ -30,7 +30,7 @@ module RServiceBus2
       @correlation_id = correlation_id
       @return_address = return_address
 
-      @createdat = DateTime.now
+      @createdat = Time.now
 
       @msg_id = UUIDTools::UUID.random_create
       @error_list = []

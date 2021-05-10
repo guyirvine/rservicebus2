@@ -5,7 +5,7 @@ module RServiceBus2
     attr_accessor :finished
 
     def initialize(saga)
-      @createdat = DateTime.now
+      @createdat = Time.now
       @correlation_id = UUIDTools::UUID.random_create
       @saga_class_name = saga.class.name
       @finished = false

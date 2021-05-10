@@ -370,11 +370,11 @@ module RServiceBus2
     # Reply queues are specified in each msg. It works like
     # email, where the reply address can actually be anywhere
     # @param [RServiceBus2::Message] msg msg to be sent
-    def reply(msg)
+    def reply(msg, timestamp = nil)
       RServiceBus2.rlog "Reply with: #{msg.class.name} To: #{@msg.return_address}"
       @stats.inc_total_reply
 
-      queue_msg_for_send_on_complete(msg, @msg.return_address)
+      queue_msg_for_send_on_complete(msg, @msg.return_address, timestamp)
     end
 
     def get_endpoint_for_msg(msg_name)

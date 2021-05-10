@@ -124,7 +124,7 @@ module RServiceBus2
 
         unless @archivedir.nil?
           basename = File.basename(file_path)
-          new_file_path = "#{@archivedir}/#{basename}.#{DateTime.now.strftime('%Y%m%d%H%M%S%L')}.zip"
+          new_file_path = "#{@archivedir}/#{basename}.#{Time.now.strftime('%Y%m%d%H%M%S%L')}.zip"
           RServiceBus2.log "Writing to archive, #{new_file_path}"
 
           Zip::ZipOutputStream.open(new_file_path) do |zos|

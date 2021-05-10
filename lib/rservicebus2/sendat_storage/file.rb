@@ -1,8 +1,13 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Send at storage file
   class SendAtStorageFile
     def initialize(uri)
+      RServiceBus2.log "SendAtStorageFile configured: #{uri.path}"
       @list = load(uri.path)
+      puts "@list: #{@list.class.name}"
+      @path = uri.path
     end
 
     def load(path)
@@ -20,7 +25,7 @@ module RServiceBus2
       save
     end
 
-    def get_all
+    def all
       @list
     end
 
@@ -31,7 +36,7 @@ module RServiceBus2
 
     def save
       content = YAML.dump(@list)
-      File.open(@uri.path, 'w') { |f| f.write(YAML.dump(content)) }
+      File.open(@path, 'w') { |f| f.write(content) }
     end
   end
 end

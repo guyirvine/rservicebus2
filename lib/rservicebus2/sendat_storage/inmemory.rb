@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Send at storage in memory
   class SendAtStorageInMemory
