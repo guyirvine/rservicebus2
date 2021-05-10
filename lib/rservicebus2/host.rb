@@ -1,10 +1,15 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   class NoHandlerFound < StandardError
   end
+
   class ClassNotFoundForMsg < StandardError
   end
+
   class NoMsgToProcess < StandardError
   end
+
   class PropertyNotSet < StandardError
   end
 
@@ -14,10 +19,8 @@ module RServiceBus2
 
     # Provides a thin logging veneer
     # @param [String] string Log entry
-    # @param [Boolean] ver Indicator for a verbose log entry
-    def log(string, ver = false)
-#      RServiceBus2.log(string, ver)
-      RServiceBus2.log(string, true)
+    def log(string)
+      RServiceBus2.log(string)
     end
 
     # Thin veneer for Configuring external resources
@@ -130,7 +133,7 @@ module RServiceBus2
     def load_libs
       log 'Load Libs'
       @config.lib_list.each do |path|
-        $:.unshift path
+        $LOAD_PATH.unshift path
       end
 
       self
@@ -145,18 +148,19 @@ module RServiceBus2
 
     # Initialise statistics monitor
     def configure_statistics
-      @stats = StatisticManager.new( self )
+      @stats = StatisticManager.new(self)
       self
     end
 
     def initialize
       RServiceBus2.rlog "Current directory: #{Dir.pwd}"
-      @config = ConfigFromEnv.new.load_host_section
-                                  .load_contracts
-                                  .load_handler_path_list
-                                  .load_saga_path_list
-                                  .load_libs
-                                  .load_working_dir_list
+      @config = ConfigFromEnv.new
+                             .load_host_section
+                             .load_contracts
+                             .load_handler_path_list
+                             .load_saga_path_list
+                             .load_libs
+                             .load_working_dir_list
 
       connect_to_mq
 
