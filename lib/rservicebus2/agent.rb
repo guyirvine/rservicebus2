@@ -33,8 +33,8 @@ module RServiceBus2
         q = queue_name
       else
         parts = queueName.split('@')
-        msg.set_remote_queue_name(parts[0])
-        msg.set_remote_host_name(parts[1])
+        msg.remote_queue_name = parts[0]
+        msg.remote_host_name = parts[1]
         q = 'transport-out'
       end
 

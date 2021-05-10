@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'zlib'
 require 'yaml'
 require 'uuidtools'
@@ -5,9 +7,11 @@ require 'uuidtools'
 module RServiceBus2
   # This is the top level message that is passed around the bus
   class Message
-    attr_reader :return_address, :msg_id, :remote_queue_name, :remote_host_name,
+    attr_reader :return_address, :msg_id,
                 :last_error_source_queue, :last_error_string, :correlation_id,
                 :sendat, :error_list
+
+    attr_accessor :remote_host_name, :remote_queue_name, :send_at
 
     # Constructor
     #
@@ -47,25 +51,11 @@ module RServiceBus2
       @error_list << RServiceBus2::ErrorMessage.new(source_queue, error_string)
     end
 
-    def set_remote_host_name(host_name)
-      @remote_host_name = host_name
-    end
-
-    def set_remote_queue_name(queue_name)
-      @remote_queue_name = queue_name
-    end
-
-    def send_at(timestamp)
-      @send_at = timestamp
-    end
-
     # @return [Object] The msg to be sent
     def msg
-      if @compressed == true
-        return YAML.load(Zlib::Inflate.inflate(@_msg))
-      else
-        return YAML.load( @_msg )
-      end
+      return YAML.load(Zlib::Inflate.inflate(@_msg)) if @compressed == true
+
+      YAML.load(@_msg)
     rescue ArgumentError => e
       raise e if e.message.index('undefined class/module ').nil?
 

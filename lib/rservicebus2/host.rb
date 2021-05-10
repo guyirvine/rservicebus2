@@ -339,8 +339,8 @@ module RServiceBus2
         RServiceBus2.rlog "Sending, #{msg.class.name} to, #{queue_name}"
       else
         parts = queue_name.split('@')
-        r_msg.set_remote_queue_name(parts[0])
-        r_msg.set_remote_host_name(parts[1])
+        r_msg.remote_queue_name = parts[0]
+        r_msg.remote_host_name = parts[1]
         q = 'transport-out'
         RServiceBus2.rlog "Sending, #{msg.class.name} to, #{queue_name}, via #{q}"
       end
