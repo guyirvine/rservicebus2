@@ -17,8 +17,8 @@ module RServiceBus2
           k = k.sub('RSBFDB2_', '')
           rm.add k, AppResourceFluidDb2.new(host, uri)
         elsif v.is_a?(String) &&
-              (k.start_with?('RSBFDB_') || v.index('fluiddb') == 0)
-          v = v['fluiddb'.length..-1] if v.index('fluiddb') == 0
+              (k.start_with?('RSBFDB_') || v.start_with?('fluiddb'))
+          v = v['fluiddb'.length..-1] if v.start_with?('fluiddb')
           uri = URI.parse(v)
           require 'rservicebus2/appresource/fluiddb'
 
