@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'beanstalk-client'
 require 'rservicebus2/mq'
 
@@ -34,6 +36,7 @@ module RServiceBus2
         abort
       end
     end
+    # rubocop:enable Metrics/AbcSize,Metrics/MethodLength
 
     def subscribe(queuename)
       @beanstalk.watch(queuename)
@@ -45,6 +48,7 @@ module RServiceBus2
         @job = @beanstalk.reserve @timeout
       rescue StandardError => e
         raise NoMsgToProcess if e.message == 'TIMED_OUT'
+
         raise e
       end
       @job.body
@@ -63,7 +67,7 @@ module RServiceBus2
       if msg.length > @max_job_size
         puts '***Attempting to send a msg which will not fit on queue.'
         puts "***Msg size, #{msg.length}, max msg size, #{@max_job_size}."
-        fail JobTooBigError, "Msg size, #{msg.length}, max msg size,
+        raise JobTooBigError, "Msg size, #{msg.length}, max msg size,
               #{@max_job_size}"
       end
       @beanstalk.use(queue_name)
