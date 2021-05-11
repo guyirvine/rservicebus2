@@ -1,4 +1,4 @@
-#Req
+#Saga
 
 ##What
 This is the starting point for RServiceBus Saga's
@@ -19,4 +19,4 @@ run the
 command in one terminal
 
 in a second terminal, run
-  ruby Client.rb
+  ruby client.rb

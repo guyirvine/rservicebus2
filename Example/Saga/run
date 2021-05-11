@@ -1,4 +1,7 @@
+touch /tmp/saga.txt
+
 APPNAME=Saga \
 VERBOSE=true \
+MAX_RETRIES=0 \
 MESSAGE_ENDPOINT_MAPPINGS=Msg41:SagaFinished  \
 ../rservicebus_examples
