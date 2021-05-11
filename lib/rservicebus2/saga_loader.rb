@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Given a directory, this class is responsible loading Sagas
   class SagaLoader
@@ -17,11 +19,11 @@ module RServiceBus2
     #  require statement.
     # @param [String] file_path the path to be cleaned
     def get_require_path(file_path)
-      file_path = './' + file_path unless file_path.start_with?('/')
+      file_path = "./#{file_path}" unless file_path.start_with?('/')
 
       return file_path.sub('.rb', '') if File.exist?(file_path)
 
-      abort('Filepath, ' + file_path + ", given for Saga require doesn't exist")
+      abort("Filepath, #{file_path}, given for Saga require doesn't exist")
     end
 
     # Instantiate the saga named in sagaName from the file name in file_path
@@ -32,6 +34,8 @@ module RServiceBus2
     # @param [String] sagaName name of the saga to instantiate
     # @param [String] file_path the path to the file to be loaded
     # @return [RServiceBus2::Saga] the loader
+
+    # rubocop:disable Metrics/MethodLength
     def load_saga_from_file(saga_name, file_path)
       require_path = get_require_path(file_path)
 
@@ -39,52 +43,51 @@ module RServiceBus2
       begin
         saga = Object.const_get(saga_name)
       rescue StandardError => e
-        puts 'Expected class name: ' + saga_name + ', not found after require:
-          ' + require_path
-        puts '**** Check in ' + file_path + ' that the class is named : ' +
-          saga_name
-        puts '( In case its not that )'
+        puts "Expected class name: #{saga_name}, not found after require: #{require_path}" \
+             "**** Check in #{file_path} that the class is named: #{saga_name}" \
+             '( In case its not that )'
         raise e
       end
       saga
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Wrapper function
     # @param [String] file_path
     # @param [String] sagaName
     # @returns [RServiceBus2::Saga] saga
+
+    # rubocop:disable Metrics/MethodLength
     def load_saga(file_path, saga_name)
       if @list_of_loaded_paths.key?(file_path)
         RServiceBus2.log "Not reloading, #{file_path}"
         return
       end
 
-      begin
-        RServiceBus2.rlog 'file_path: ' + file_path
-        RServiceBus2.rlog 'saga_name: ' + saga_name
+      RServiceBus2.rlog "file_path: #{file_path}"
+      RServiceBus2.rlog "saga_name: #{saga_name}"
 
-        saga = load_saga_from_file(saga_name, file_path)
-        RServiceBus2.log 'Loaded Saga: ' + saga_name
+      saga = load_saga_from_file(saga_name, file_path)
+      RServiceBus2.log "Loaded Saga: #{saga_name}"
 
-        @saga_manager.register_saga(saga)
+      @saga_manager.register_saga(saga)
 
-        @list_of_loaded_paths[file_path] = 1
-      rescue StandardError => e
-        puts 'Exception loading saga from file: ' + file_path
-        puts e.message
-        puts e.backtrace[0]
-        abort
-      end
+      @list_of_loaded_paths[file_path] = 1
+    rescue StandardError => e
+      puts "Exception loading saga from file: #{file_path}"
+      puts e.message
+      puts e.backtrace[0]
+      abort
     end
+    # rubocop:enable Metrics/MethodLength
 
     # This method is overloaded for unit tests
     # @param [String] path directory to check
     # @return [Array] a list of paths to files found in the given path
     def get_list_of_files_for_dir(path)
-      list = Dir[path + '/*']
+      list = Dir["#{path}/*"]
 
-      RServiceBus2.rlog "SagaLoader.getListOfFilesForDir. path: #{path},
-        list: #{list}"
+      RServiceBus2.rlog "SagaLoader.getListOfFilesForDir. path: #{path}, list: #{list}"
 
       list
     end
@@ -97,7 +100,7 @@ module RServiceBus2
 
       saga_name = base_name.sub(ext_name, '')
 
-      "saga_#{saga_name}".gsub(/(?<=_|^)(\w)/){$1.upcase}.gsub(/(?:_)(\w)/,'\1')
+      "saga_#{saga_name}".gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
     end
 
     # Entry point for loading Sagas
