@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Monitor
   class Monitor
@@ -5,12 +7,12 @@ module RServiceBus2
 
     # The method which actually connects to the resource.
     def connect(_uri)
-      fail 'Method, connect, needs to be implemented for resource'
+      raise 'Method, connect, needs to be implemented for resource'
     end
 
     # The method which actually connects to the resource.
     def look
-      fail 'Method, Look, needs to be implemented for the Monitor'
+      raise 'Method, Look, needs to be implemented for the Monitor'
     end
 
     def _connect
@@ -34,8 +36,7 @@ module RServiceBus2
     end
 
     # A notification that allows cleanup
-    def finished
-    end
+    def finished; end
 
     # At least called in the Host rescue block, to ensure all network links
     #  are healthy
@@ -43,9 +44,8 @@ module RServiceBus2
       begin
         finished
       rescue StandardError => e
-        puts '** Monitor. An error was raised while closing connection to, ' +
-          @uri
-        puts 'Message: ' + e.message
+        puts "** Monitor. An error was raised while closing connection to, #{@uri}"
+        puts "Message: #{e.message}"
         puts e.backtrace
       end
 
