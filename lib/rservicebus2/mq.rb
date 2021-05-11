@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module RServiceBus2
@@ -10,6 +12,7 @@ module RServiceBus2
   class MQ
     attr_reader :local_queue_name
 
+    # rubocop:disable Metrics/MethodLength
     def self.get
       mq_string = RServiceBus2.get_value('RSBMQ', 'beanstalk://localhost')
       uri = URI.parse(mq_string)
@@ -34,31 +37,26 @@ module RServiceBus2
 
       mq
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Resources are attached, and are be specified using the URI syntax
     # @param [URI] uri the type and location of queue,
     #  eg beanstalk://127.0.0.1/foo
     # @param [Integer] timeout the amount of time to wait for a msg to arrive
-    def initialize(uri)
-      if uri.is_a? URI
-        @uri = uri
-      else
-        puts 'uri must be a valid URI'
-        abort
-      end
 
-      if uri.path == '' || uri.path == '/'
-        @local_queue_name = RServiceBus2.get_value('APPNAME', 'RServiceBus')
-      else
-        @local_queue_name = uri.path
-        @local_queue_name[0] = ''
-      end
+    # rubocop:disable Metrics/MethodLength
+    def initialize(uri)
+      abort 'Paramter to mq must be a valid URI' unless uri.is_a? URI
+
+      @uri = uri
+      @local_queue_name = uri.path
+      @local_queue_name[0] = '' if @local_queue_name[0] == '/'
+      @local_queue_name = RServiceBus2.get_value('APPNAME', 'RServiceBus') if @local_queue_name == ''
 
       if @local_queue_name == ''
-        puts "@local_queue_name: #{@local_queue_name}"
-        puts 'Queue name must be supplied '
-        puts "*** uri, #{uri}, needs to contain a queue name"
-        puts '*** the structure is scheme://host[:port]/queuename'
+        puts 'Queue name must be supplied ' \
+             "*** uri, #{uri}, needs to contain a queue name" \
+             '*** the structure is scheme://host[:port]/queuename'
         abort
       end
 
@@ -66,42 +64,41 @@ module RServiceBus2
       connect(uri.host, uri.port)
       subscribe(@local_queue_name)
     end
+    # rubocop:enable Metrics/MethodLength
 
     # Connect to the broker
     # @param [String] host machine runnig the mq
     # @param [String] port port the mq is running on
     def connect(_host, _port)
-      fail 'Method, connect, needs to be implemented'
+      raise 'Method, connect, needs to be implemented'
     end
 
     # Connect to the receiving queue
     # @param [String] queuename name of the receiving queue
     def subscribe(_queuename)
-      fail 'Method, subscribe, needs to be implemented'
+      raise 'Method, subscribe, needs to be implemented'
     end
 
     # Get next msg from queue
     def pop
-      fail 'Method, pop, needs to be implemented'
+      raise 'Method, pop, needs to be implemented'
     end
 
     # "Commit" the pop
     def ack
-      fail 'Method, ack, needs to be implemented'
+      raise 'Method, ack, needs to be implemented'
     end
 
     # At least called in the Host rescue block, to ensure all network links are
     #  healthy
     # @param [String] queue_name name of the queue to which the msg should be sent
     # @param [String] msg msg to be sent
-    def send(queue_name, msg)
-      begin
-        @connection.close
-      rescue
-        puts 'AppResource. An error was raised while closing connection to, ' + @uri.to_s
-      end
-
-end
-
-end
+    def send(_queue_name, _msg)
+      @connection.close
+    rescue StandardError => e
+      puts "AppResource. An error was raised while closing connection to, #{@uri}"
+      puts "Error: #{e.message}"
+      puts "Backtrace: #{e.backtrace}"
+    end
+  end
 end
