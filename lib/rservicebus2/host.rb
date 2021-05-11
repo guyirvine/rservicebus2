@@ -119,7 +119,7 @@ module RServiceBus2
       configure_saga_storage
       configure_app_resource
       @circuit_breaker = CircuitBreaker.new(self)
-      @monitors = ConfigureMonitor.new(self, @resource_manager).get_monitors(ENV)
+      @monitors = ConfigureMonitor.new(self, @resource_manager).monitors(ENV)
       load_handlers
       load_sagas
       @cron_manager = CronManager.new(self, @handler_manager.msg_names)

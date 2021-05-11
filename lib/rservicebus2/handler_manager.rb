@@ -102,7 +102,7 @@ module RServiceBus2
         next if @resource_list_by_handler_name[handler.class.name].nil?
 
         @resource_list_by_handler_name[handler.class.name].each do |k|
-          handler.instance_variable_set("@#{k}", @resource_manager.get(k).get_resource)
+          handler.instance_variable_set("@#{k}", @resource_manager.get(k).resource)
           RServiceBus2.rlog "App resource attribute, #{k}, set for: #{handler.class.name}"
         end
       end
