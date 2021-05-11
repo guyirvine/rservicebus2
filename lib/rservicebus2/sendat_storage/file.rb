@@ -6,7 +6,6 @@ module RServiceBus2
     def initialize(uri)
       RServiceBus2.log "SendAtStorageFile configured: #{uri.path}"
       @list = load(uri.path)
-      puts "@list: #{@list.class.name}"
       @path = uri.path
     end
 
