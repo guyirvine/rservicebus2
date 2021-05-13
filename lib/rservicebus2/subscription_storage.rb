@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 
 module RServiceBus2
@@ -14,8 +16,8 @@ module RServiceBus2
     end
 
     # Get a list of all subscription, as an Array
-    def get_all
-      fail 'Method, get_all, needs to be implemented for SubscriptionStorage'
+    def all
+      raise 'Method, all, needs to be implemented for SubscriptionStorage'
     end
 
     # Add a new subscription
@@ -23,7 +25,7 @@ module RServiceBus2
     #  has asked for notification
     # @param [String] queue_name the queue to which the event should be sent
     def add(_event_name, _queue_name)
-      fail 'Method, add, needs to be implemented for this subscription storage'
+      raise 'Method, add, needs to be implemented for this subscription storage'
     end
 
     # Remove an existing subscription
@@ -32,8 +34,7 @@ module RServiceBus2
     #  has asked for notification
     # @param [String] queue_name the queue to which the event should be sent
     def remove(_event_name, _queue_name)
-      fail 'Method, remove, needs to be implemented for this subscription
-        storage'
+      raise 'Method, remove, needs to be implemented for this subscription storage'
     end
   end
 end
