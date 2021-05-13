@@ -12,8 +12,7 @@ module RServiceBus2
       RServiceBus2.log(string)
     end
 
-    # rubocop:disable Metrics/AbcSize
-    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def configure_mapping(mapping)
       match = mapping.match(/(.+):(.+)/)
       if match.nil?
@@ -36,8 +35,7 @@ module RServiceBus2
       end
       @queue_name_list << match[2]
     end
-    # rubocop:enable Metrics/AbcSize
-    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/AbcSize, Metrics/MethodLength
 
     # rubocop:disable Metrics/MethodLength
     def configure(local_queue_name = nil)
