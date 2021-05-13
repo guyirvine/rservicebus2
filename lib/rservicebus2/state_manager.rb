@@ -17,15 +17,15 @@ module RServiceBus2
     end
 
     def begin
-      @state_storage.begin unless @state_storage.nil?
+      @state_storage&.begin
     end
 
     def get(handler)
-      @state_storage.get(handler) unless @state_storage.nil?
+      @state_storage&.get(handler)
     end
 
     def commit
-      @state_storage.commit unless @state_storage.nil?
+      @state_storage&.commit
     end
   end
 end
