@@ -1,0 +1,4 @@
+APPNAME=HelloWorld \
+MAX_RETRIES=0 \
+RSBOB_Factory=beanstalk://localhost/GuysTmpQueue \
+../rservicebus_examples

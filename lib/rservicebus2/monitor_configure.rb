@@ -57,6 +57,9 @@ module RServiceBus2
       when 'dirnotifier'
         require 'rservicebus2/monitor/dirnotifier'
         monitor = MonitorDirNotifier.new(@host, name, uri)
+      when 'beanstalk'
+        require 'rservicebus2/monitor/beanstalk'
+        monitor = MonitorBeanstalk.new(@host, name, uri)
       else
         abort("Scheme, #{uri.scheme}, not recognised when configuring
           Monitor, #{key}=#{val}")
