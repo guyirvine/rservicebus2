@@ -14,14 +14,14 @@ module RServiceBus2
     convert_dto_to_hash(obj).to_json
   end
 
-  def self.log(string, ver = false)
+  def self.log(string, ver: false)
     return if check_environment_variable('TESTING')
 
     type = ver ? 'VERB' : 'INFO'
-    if check_environment_variable('VERBOSE') || !ver
-      timestamp = Time.new.strftime('%Y-%m-%d %H:%M:%S')
-      puts "[#{type}] #{timestamp} :: #{string}"
-    end
+    return unless check_environment_variable('VERBOSE') || !ver
+
+    timestamp = Time.new.strftime('%Y-%m-%d %H:%M:%S')
+    puts "[#{type}] #{timestamp} :: #{string}"
   end
 
   def self.rlog(string)
@@ -43,6 +43,7 @@ module RServiceBus2
     value
   end
 
+  # rubocop:disable Metrics/MethodLength
   def self.send_msg(msg, response_queue = 'agent')
     require 'rservicebus2/endpointmapping'
     endpoint_mapping = EndpointMapping.new
@@ -54,13 +55,12 @@ module RServiceBus2
     Audit.new(agent).audit_to_queue(msg)
     agent.send_msg(msg, queue_name, response_queue)
   rescue QueueNotFoundForMsg => e
-    msg = "\n"
-    msg = "#{msg}*** Queue not found for, #{e.message}\n"
-    msg = "#{msg}*** Ensure you have an environment variable set for this
-            Message Type, eg, \n"
-    msg = "#{msg}*** MESSAGE_ENDPOINT_MAPPINGS=#{e.message}:<QueueName>\n"
-    raise StandardError, msg
+    raise StandardError, '' \
+      "*** Queue not found for, #{e.message}\n" \
+      "*** Ensure you have an environment variable set for this Message Type, eg, \n" \
+      "*** MESSAGE_ENDPOINT_MAPPINGS=#{e.message}:<QueueName>\n"
   end
+  # rubocop:enable Metrics/MethodLength
 
   def self.check_for_reply(queue_name)
     ENV['RSBMQ'] = 'beanstalk://localhost' if ENV['RSBMQ'].nil?
@@ -77,8 +77,7 @@ module RServiceBus2
   end
 
   def self.check_environment_variable(string)
-    return false if ENV[string].nil?
-    return false if ENV[string] == ''
+    return false if ENV[string].nil? || ENV[string] == ''
     return true if ENV[string] == true || ENV[string] =~ (/(true|t|yes|y|1)$/i)
     return false if ENV[string] == false ||
                     ENV[string].nil? ||
