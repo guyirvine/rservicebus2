@@ -2,6 +2,7 @@
 
 module RServiceBus2
   # Marshals configuration information for an rservicebus host
+  # rubocop:disable Metrics/ClassLength
   class Config
     attr_reader :app_name, :message_endpoint_mappings, :handler_path_list,
                 :saga_path_list, :error_queue_name, :max_retries,
@@ -49,6 +50,7 @@ module RServiceBus2
       self
     end
 
+    # rubocop:disable Metrics/MethodLength
     def load_host_section
       @app_name = get_value('APPNAME', 'RServiceBus2')
       @error_queue_name = get_value('ERROR_QUEUE_NAME', 'error')
@@ -68,6 +70,7 @@ module RServiceBus2
 
       self
     end
+    # rubocop:enable Metrics/MethodLength
 
     def ensure_contract_file_exists(path)
       unless File.exist?(path) || File.exist?("#{path}.rb")
@@ -75,11 +78,11 @@ module RServiceBus2
         puts "*** path, #{path}, provided does not exist as a file"
         abort
       end
-      unless File.extname(path) == '' || File.extname(path) == '.rb'
-        puts 'Error while processing contracts'
-        puts "*** path, #{path}, should point to a ruby file, with extention .rb"
-        abort
-      end
+      return if File.extname(path) == '.rb'
+
+      puts 'Error while processing contracts'
+      puts "*** path, #{path}, should point to a ruby file, with extention .rb"
+      abort
     end
 
     # Marshals paths for contracts
@@ -102,6 +105,16 @@ module RServiceBus2
     # Marshals paths for lib
     # Note. .rb extension is optional
     # Expected format: /one/two/contracts
+    def load_lib(path)
+      log "Loading libs from, #{path}"
+      return path if File.exist?(path)
+
+      puts 'Error while processing libs'
+      puts "*** path, #{path}, should point to a ruby file, with extention .rb, or"
+      puts "*** path, #{path}, should point to a directory than conatins ruby files, that have extention .rb"
+      abort
+    end
+
     def load_libs
       @lib_list = []
 
@@ -109,18 +122,7 @@ module RServiceBus2
       paths = './lib' if paths.nil? && File.exist?('./lib')
       return self if paths.nil?
 
-      paths.split(';').each do |path|
-        log "Loading libs from, #{path}"
-        unless File.exist?(path)
-          puts 'Error while processing libs'
-          puts "*** path, #{path}, should point to a ruby file, with extention
-                .rb, or"
-          puts "*** path, #{path}, should point to a directory than conatins
-                ruby files, that have extention .rb"
-          abort
-        end
-        @lib_list << path
-      end
+      paths.split(';').each { |path| @lib_list << load_lib(path) }
       self
     end
 
@@ -132,29 +134,35 @@ module RServiceBus2
     # Marshals paths for working_dirs
     # Note. trailing slashs will be stripped
     # Expected format: <path 1>;<path 2>
+    def load_working_dir_path(path)
+      path = path.strip.chomp('/')
+      unless Dir.exist?(path.to_s)
+        puts 'Error while processing working directory list'
+        puts "*** path, #{path}, does not exist"
+        abort
+      end
+      @handler_path_list << "#{path}/messagehandler" if Dir.exist?("#{path}/messagehandler")
+      @saga_path_list << "#{path}/saga" if Dir.exist?("#{path}/saga")
+      @contract_list << "#{path}/contract.rb" if File.exist?("#{path}/contract.rb")
+      @lib_list << "#{path}/lib" if File.exist?("#{path}/lib")
+    end
+
     def load_working_dir_list
       path_list = get_value('WORKING_DIR', './')
       return self if path_list.nil?
 
       path_list.split(';').each do |path|
-        path = path.strip.chomp('/')
-        unless Dir.exist?(path.to_s)
-          puts 'Error while processing working directory list'
-          puts "*** path, #{path}, does not exist"
-          abort
-        end
-        @handler_path_list << "#{path}/messagehandler" if Dir.exist?("#{path}/messagehandler")
-        @saga_path_list << "#{path}/saga" if Dir.exist?("#{path}/saga")
-        @contract_list << "#{path}/contract.rb" if File.exist?("#{path}/contract.rb")
-        @lib_list << "#{path}/lib" if File.exist?("#{path}/lib")
+        load_working_dir_path(path)
       end
       self
     end
   end
+  # rubocop:enable Metrics/ClassLength
 
   # Class
+  # rubocop:disable Lint/MissingSuper
   class ConfigFromEnv < Config
-    def initialize; end;
+    def initialize; end
   end
 
   # Class
@@ -162,6 +170,7 @@ module RServiceBus2
     attr_writer :app_name, :message_endpoint_mappings, :handler_path_list, :error_queue_name, \
                 :max_retries, :forward_received_messages_to, :beanstalk_host
 
-    def initialize; end;
+    def initialize; end
   end
+  # rubocop:enable Lint/MissingSuper
 end
