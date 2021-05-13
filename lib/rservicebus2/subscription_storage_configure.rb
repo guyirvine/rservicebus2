@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'uri'
 module RServiceBus2
   # Configure SubscriptionStorage for an rservicebus host
