@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rservicebus2/monitor/dir'
 require 'xmlsimple'
 

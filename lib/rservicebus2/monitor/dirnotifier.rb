@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'cgi'
 require 'fileutils'
 require 'pathname'
@@ -6,6 +8,7 @@ module RServiceBus2
   # Monitor for Directory
   class MonitorDirNotifier < Monitor
     attr_reader :path, :processing_folder, :filter
+
     def connect(uri)
       # Pass the path through the Dir object to check syntax on startup
       begin

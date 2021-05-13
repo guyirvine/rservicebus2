@@ -1,38 +1,39 @@
+# frozen_string_literal: true
+
 require 'cgi'
 require 'zip/zip'
 require 'zlib'
 
 module RServiceBus2
   # Monitor Directory for files
+
   # rubocop:disable Metrics/ClassLength
   class MonitorDir < Monitor
-    def connect(uri)
+    def input_dir(uri)
       # Pass the path through the Dir object to check syntax on startup
-      begin
-        input_dir = Dir.new(uri.path)
-        unless File.writable?(uri.path)
-          puts "***** Directory is not writable, #{uri.path}."
-          puts "***** Make the directory, #{uri.path}, writable and try again."
-          abort
-        end
-      rescue Errno::ENOENT
-        puts "***** Directory does not exist, #{uri.path}."
-        puts "***** Create the directory, #{uri.path}, and try again."
-        puts "***** eg, mkdir #{uri.path}"
-        abort
-      rescue Errno::ENOTDIR
-        puts "***** The specified path does not point to a directory,
-              #{uri.path}."
-        puts "***** Either repoint path to a directory, or remove, #{uri.path},
-              and create it as a directory."
-        puts "***** eg, rm #{uri.path} && mkdir #{uri.path}"
-        abort
-      end
+      return Dir.new(uri.path) if File.writable?(uri.path)
 
-      @path = input_dir.path
+      puts "***** Directory is not writable, #{uri.path}.\n" \
+           "***** Make the directory, #{uri.path}, writable and try again."
+      abort
+    rescue Errno::ENOENT
+      puts "***** Directory does not exist, #{uri.path}.\n" \
+            "***** Create the directory, #{uri.path}, and try again.\n" \
+            "***** eg, mkdir #{uri.path}"
+      abort
+    rescue Errno::ENOTDIR
+      puts "***** The specified path does not point to a directory, #{uri.path}.\n" \
+            "***** Either repoint path to a directory, or remove, #{uri.path}, and create it as a directory.\n" \
+            "***** eg, rm #{uri.path} && mkdir #{uri.path}"
+      abort
+    end
+
+    def connect(uri)
+      @path = input_dir(uri).path
       @input_filter = []
 
       return if uri.query.nil?
+
       parts = CGI.parse(uri.query)
       @querystringparts = parts
       if parts.key?('archive')
@@ -141,4 +142,5 @@ module RServiceBus2
       end
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end

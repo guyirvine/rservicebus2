@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-sqs'
 require 'aws-sdk-sts'
 
@@ -12,20 +14,20 @@ module RServiceBus2
       sts_client = Aws::STS::Client.new(region: region)
       caller_identity_account = sts_client.get_caller_identity.account
 
-      @queue_url = "https://sqs.#{region}.amazonaws.com/" +
-                   "#{caller_identity_account}/#{queue_name}"
+      @queue_url = "https://sqs.#{region}.amazonaws.com/#{caller_identity_account}/#{queue_name}"
       @sqs_client = Aws::SQS::Client.new(region: region)
     end
 
     def look
-      # TODO make max available as env variable
       response = @sqs_client.receive_message(queue_url: @queue_url, max_number_of_messages: 1)
       response.messages.each do |message|
         send(message.body, URI.parse(CGI.escape(@queue_url)))
-        @sqs_client.delete_message({
-          queue_url: @queue_url,
-          receipt_handle: message.receipt_handle
-        })
+        @sqs_client.delete_message(
+          {
+            queue_url: @queue_url,
+            receipt_handle: message.receipt_handle
+          }
+        )
       end
     end
   end

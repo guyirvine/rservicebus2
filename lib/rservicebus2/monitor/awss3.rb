@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-s3'
 
 module RServiceBus2
@@ -36,7 +38,7 @@ module RServiceBus2
       file_processed = 0
       max_files_processed = 2
 
-      objects = @s3_client.list_objects_v2( bucket: @bucket_name, max_keys: max_files_processed).contents
+      objects = @s3_client.list_objects_v2(bucket: @bucket_name, max_keys: max_files_processed).contents
 
       objects.each do |object|
         RServiceBus2.log "Ready to process, #{object.key}"
