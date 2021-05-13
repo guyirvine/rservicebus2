@@ -48,7 +48,7 @@ module RServiceBus2
           begin
             open_folder processing_uri.path
             unless File.writable?(processing_uri.path)
-              puts "***** Processing Directory is not writable,
+              puts "***** 1Processing Directory is not writable,
                     #{processing_uri.path}."
               puts "***** Make the directory, #{processing_uri.path},
                     writable and try again."

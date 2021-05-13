@@ -14,7 +14,7 @@ module RServiceBus2
     convert_dto_to_hash(obj).to_json
   end
 
-  def self.log(string, ver: false)
+  def self.log(string, ver = false)
     return if check_environment_variable('TESTING')
 
     type = ver ? 'VERB' : 'INFO'
