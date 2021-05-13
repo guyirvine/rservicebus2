@@ -1,8 +1,11 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Used to collect various run time stats for runtime reporting
   class StatisticManager
     attr_accessor :output
 
+    # rubocop:disable Metrics/MethodLength
     def initialize(host)
       @host = host
       @hash = {}
@@ -20,6 +23,7 @@ module RServiceBus2
         RServiceBus2.get_value('STAT_OUTPUT_COUNTDOWN', '1').to_i
       @stat_output_countdown = 0
     end
+    # rubocop:enable Metrics/MethodLength
 
     def inc_total_processed
       @total_processed += 1
@@ -51,7 +55,7 @@ module RServiceBus2
       @total_by_message_type[class_name] += 1
     end
 
-    def get_for_reporting_2
+    def internal_formatted_reporting
       return unless @written == false
 
       @written = true
@@ -63,7 +67,7 @@ module RServiceBus2
       types
     end
 
-    def get_for_reporting_9
+    def formatted_reporting
       "T:#{@total_processed};" \
       "E:#{@total_errored};" \
       "S:#{@total_sent};" \
@@ -72,7 +76,7 @@ module RServiceBus2
     end
 
     def report
-      @host.log(get_for_reporting_9) if @output
+      @host.log(formatted_reporting) if @output
     end
 
     def tick
