@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Add the currently running directory to the start of the load path
 # $:.unshift File.dirname(__FILE__) + '/../../lib'
 
@@ -45,10 +47,10 @@ require 'rservicebus2/monitor_configure'
 
 require 'rservicebus2/agent'
 
-require 'rservicebus2/saga_loader.rb'
-require 'rservicebus2/saga/manager.rb'
-require 'rservicebus2/saga/data.rb'
-require 'rservicebus2/saga/base.rb'
+require 'rservicebus2/saga_loader'
+require 'rservicebus2/saga/manager'
+require 'rservicebus2/saga/data'
+require 'rservicebus2/saga/base'
 
 require 'rservicebus2/saga_storage'
 
