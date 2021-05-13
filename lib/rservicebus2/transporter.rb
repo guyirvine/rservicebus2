@@ -10,6 +10,7 @@ module RServiceBus2
 
   # TODO: Poison Message? Can I bury with timeout in beanstalk ?
   # Needs to end up on an error queue, destination queue may be down.
+  # rubocop:disable Metrics/ClassLength
   class Transporter
     def get_value(name, default = nil)
       value = ENV[name].nil? || ENV[name] == '' ? default : ENV[name]
@@ -17,6 +18,7 @@ module RServiceBus2
       value
     end
 
+    # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     def connect_to_source_beanstalk
       source_queue_name = get_value('SOURCE_QUEUE_NAME', 'transport-out')
       source_url = get_value('SOURCE_URL', '127.0.0.1:11300')
@@ -36,6 +38,7 @@ module RServiceBus2
       end
       abort
     end
+    # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
     def disconnect
       RServiceBus2.log "Disconnect from,
@@ -51,6 +54,50 @@ module RServiceBus2
       @remote_queue_name = nil
     end
 
+    # rubocop:disable Metrics/MethodLength
+    def connect_local
+      @local_port = get_value('LOCAL_PORT', 27_018).to_i
+      RServiceBus2.rlog "Local Port: #{@local_port}"
+
+      RServiceBus2.log "Connect SSH, #{@remote_user_name}@#{@remoteHostName}"
+      # Open port 27018 to forward to 127.0.0.11300 on the remote host
+      @gateway = Net::SSH::Gateway.new(@remote_host_name, @remote_user_name)
+      @gateway.open('127.0.0.1', 11_300, @local_port)
+      RServiceBus2.log "Connected to SSH, #{@remote_user_name}@#{@remote_host_name}"
+    rescue Errno::EADDRINUSE
+      puts "*** Local transport port in use, #{@local_port}"
+      puts "*** Change local transport port, #{@localPort}, using format, LOCAL_PORT=#{@localPort + 1}"
+      abort
+    rescue Errno::EACCES
+      puts "*** Local transport port specified, #{@local_port}, needs sudo access"
+      puts '*** Change local transport port using format, LOCAL_PORT=27018'
+      abort
+    end
+    # rubocop:enable Metrics/MethodLength
+
+    def connect_destination
+      destination_url = "127.0.0.1:#{@local_port}"
+      RServiceBus2.rlog "Connect to Remote Beanstalk, #{destination_url}"
+      @destination = Beanstalk::Pool.new([destinationUrl])
+      RServiceBus2.rlog "Connected to Remote Beanstalk, #{destination_url}"
+    rescue StandardError => e
+      if e.message == 'Beanstalk::NotConnected'
+        puts "***Could not connect to destination, check beanstalk is running at, #{destination_url}"
+        raise CouldNotConnectToDestination
+      end
+      raise
+    end
+
+    def pull_config(remote_host_name)
+      @remote_host_name = remote_host_name
+      @remote_user_name = get_value("REMOTE_USER_#{remote_host_name.upcase}")
+      return unless @remote_user_name.nil?
+
+      RServiceBus2.log "**** Username not specified for Host, #{remoteHostName}"
+      RServiceBus2.log "**** Add an environment variable of the form, REMOTE_USER_#{remoteHostName.upcase}=[USERNAME]"
+      abort
+    end
+
     def connect(remote_host_name)
       RServiceBus2.rlog "connect called, #{remote_host_name}"
       disconnect if @gateway.nil? || remoteHostName != @remote_host_name || @destination.nil?
@@ -58,47 +105,12 @@ module RServiceBus2
       return unless @gateway.nil?
 
       # Get destination url from job
-      @remote_host_name = remote_host_name
-      @remote_user_name = get_value("REMOTE_USER_#{remote_host_name.upcase}")
-      if @remote_user_name.nil?
-        RServiceBus2.log "**** Username not specified for Host, #{remoteHostName}"
-        RServiceBus2.log "**** Add an environment variable of the form, REMOTE_USER_#{remoteHostName.upcase}=[USERNAME]"
-        abort
-      end
-
-      @local_port = get_value('LOCAL_PORT', 27018).to_i
-      RServiceBus2.rlog "Local Port: #{@local_port}"
-      begin
-        RServiceBus2.log "Connect SSH, #{@remote_user_name}@#{@remoteHostName}"
-        # Open port 27018 to forward to 127.0.0.11300 on the remote host
-        @gateway = Net::SSH::Gateway.new(@remote_host_name, @remote_user_name)
-        @gateway.open('127.0.0.1', 11300, @local_port)
-        RServiceBus2.log "Connected to SSH, #{@remote_user_name}@#{@remote_host_name}"
-
-      rescue Errno::EADDRINUSE
-        puts "*** Local transport port in use, #{@local_port}"
-        puts "*** Change local transport port, #{@localPort}, using format, LOCAL_PORT=#{@localPort+1}"
-        abort
-      rescue Errno::EACCES
-        puts "*** Local transport port specified, #{@local_port}, needs sudo access"
-        puts '*** Change local transport port using format, LOCAL_PORT=27018'
-        abort
-      end
-
-      begin
-        destination_url = "127.0.0.1:#{@local_port}"
-        RServiceBus2.rlog "Connect to Remote Beanstalk, #{destination_url}"
-        @destination = Beanstalk::Pool.new([destinationUrl])
-        RServiceBus2.rlog "Connected to Remote Beanstalk, #{destination_url}"
-      rescue StandardError => e
-        if e.message == 'Beanstalk::NotConnected'
-          puts "***Could not connect to destination, check beanstalk is running at, #{destination_url}"
-          raise CouldNotConnectToDestination
-        end
-        raise
-      end
+      pull_config(remote_host_name)
+      connect_local
+      connect_destination
     end
 
+    # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     def process
       # Get the next job from the source queue
       job = @source.reserve @timeout
@@ -128,6 +140,7 @@ module RServiceBus2
       end
       raise e
     end
+    # rubocop:enable Metrics/MethodLength, Metrics/AbcSize
 
     def run
       @timeout = get_value('TIMEOUT', 5)
@@ -136,4 +149,5 @@ module RServiceBus2
       disconnect_from_remote_ssh
     end
   end
+  # rubocop:enable Metrics/ClassLength
 end
