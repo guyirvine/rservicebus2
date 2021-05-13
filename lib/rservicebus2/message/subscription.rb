@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Class to hold message subscriptions
   class MessageSubscription
