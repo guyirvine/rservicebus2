@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # Subscription Manager
   class SubscriptionManager
@@ -11,7 +13,8 @@ module RServiceBus2
       subscriptions = @subscriptions[event_name]
       if subscriptions.nil?
         RServiceBus2.log "No subscribers for event, #{event_name}"
-        RServiceBus2.log "If there should be, ensure you have the appropriate evironment variable set, eg MESSAGE_ENDPOINT_MAPPINGS=#{event_name}:<Queue Name>"
+        RServiceBus2.log 'If there should be, ensure you have the appropriate evironment variable set, ' \
+                          "eg MESSAGE_ENDPOINT_MAPPINGS=#{event_name}:<Queue Name>"
         return []
       end
 
@@ -19,13 +22,12 @@ module RServiceBus2
     end
 
     def add(event_name, queue_name)
-      RServiceBus2.log 'Adding subscription for, ' +
-        event_name + ', to, ' + queue_name
+      RServiceBus2.log "Adding subscription for, #{event_name}, to, #{queue_name}"
       @subscriptions = @subscription_storage.add(event_name, queue_name)
     end
 
     def remove(_event_name, _queue_name)
-      fail 'Method, remove, needs to be implemented for this subscription storage'
+      raise 'Method, remove, needs to be implemented for this subscription storage'
     end
   end
 end
