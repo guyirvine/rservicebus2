@@ -76,6 +76,7 @@ module RServiceBus2
       #{caller[0]}. #{string}"
   end
 
+  # rubocop:disable Metrics/CyclomaticComplexity
   def self.check_environment_variable(string)
     return false if ENV[string].nil? || ENV[string] == ''
     return true if ENV[string] == true || ENV[string] =~ (/(true|t|yes|y|1)$/i)
@@ -85,4 +86,5 @@ module RServiceBus2
 
     raise ArgumentError, "invalid value for Environment Variable: \"#{string}\""
   end
+  # rubocop:enable Metrics/CyclomaticComplexity
 end
