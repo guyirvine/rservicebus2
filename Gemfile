@@ -12,3 +12,5 @@ gem "net-ssh-gateway"
 gem "net-sftp"
 gem "parse-cron"
 gem "mocha"
+gem 'psych', '~> 3.3', '= 3.3.2'
+
