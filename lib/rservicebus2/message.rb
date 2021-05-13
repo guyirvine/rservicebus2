@@ -18,6 +18,7 @@ module RServiceBus2
     # @param [Object] msg The msg to be sent
     # @param [Object] returnAddress A queue to which the destination message
     #  handler can send replies
+    # rubocop:disable Metrics/MethodLength
     def initialize(msg, return_address, correlation_id = nil)
       if RServiceBus2.check_environment_variable('RSBMSG_COMPRESS')
         @compressed = true
@@ -35,6 +36,7 @@ module RServiceBus2
       @msg_id = UUIDTools::UUID.random_create
       @error_list = []
     end
+    # rubocop:enable Metrics/MethodLength
 
     # If an error occurs while processing the message, this method allows details of the error to held
     # next to the msg.
