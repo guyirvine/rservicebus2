@@ -21,7 +21,6 @@ require 'rservicebus2/mq'
 require 'rservicebus2/host'
 require 'rservicebus2/config'
 require 'rservicebus2/endpointmapping'
-require 'rservicebus2/stats'
 require 'rservicebus2/statistic_manager'
 require 'rservicebus2/audit'
 
