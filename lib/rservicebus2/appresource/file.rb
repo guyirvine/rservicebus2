@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # App Resource File
   class AppResourceFile < AppResource

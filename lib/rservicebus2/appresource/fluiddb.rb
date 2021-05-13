@@ -1,4 +1,7 @@
+# frozen_string_literal: true
+
 require 'FluidDb/Db'
+
 module RServiceBus2
   # Implementation of an AppResource - FluidDb
   class AppResourceFluidDb < AppResource

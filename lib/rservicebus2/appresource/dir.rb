@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RServiceBus2
   # AppResourceDir
   class AppResourceDir < AppResource
@@ -26,5 +28,6 @@ module RServiceBus2
 
       input_dir
     end
+    # rubocop:enable Metrics/AbcSize,Metrics/MethodLength
   end
 end

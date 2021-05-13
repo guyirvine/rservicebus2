@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'fluiddb2'
 
 module RServiceBus2
@@ -16,8 +18,8 @@ module RServiceBus2
     def commit
       @connection.commit
     end
-
     # Transaction Semantics
+
     def rollback
       @connection.rollback
     end
