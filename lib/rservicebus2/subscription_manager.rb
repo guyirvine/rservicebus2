@@ -5,7 +5,7 @@ module RServiceBus2
   class SubscriptionManager
     def initialize(subscription_storage)
       @subscription_storage = subscription_storage
-      @subscriptions = @subscription_storage.get_all
+      @subscriptions = @subscription_storage.all
     end
 
     # Get subscriptions for given eventName
