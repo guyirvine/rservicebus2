@@ -252,18 +252,30 @@ module RServiceBus2
           message_loop = false
         rescue NoMsgToProcess => e
           # This exception is just saying there are no messages to process
-          @queue_for_msgs_to_be_sent_on_complete = []
-          @monitors.each(&:look)
-          send_queued_msgs
-          @queue_for_msgs_to_be_sent_on_complete = nil
+          begin
+            @queue_for_msgs_to_be_sent_on_complete = []
+            @monitors.each(&:look)
+            send_queued_msgs
+            @queue_for_msgs_to_be_sent_on_complete = nil
 
-          @queue_for_msgs_to_be_sent_on_complete = []
-          @cron_manager.run
-          send_queued_msgs
-          @queue_for_msgs_to_be_sent_on_complete = nil
+            @queue_for_msgs_to_be_sent_on_complete = []
+            @cron_manager.run
+            send_queued_msgs
+            @queue_for_msgs_to_be_sent_on_complete = nil
 
-          @send_at_manager.process
-          @circuit_breaker.success
+            @send_at_manager.process
+            @circuit_breaker.success
+          rescue StandardError => e
+            if e.message == 'SIGTERM' || e.message == 'SIGINT'
+              puts 'Exiting on request ...'
+              message_loop = false
+            else
+              puts '*** This is really unexpected.'
+              message_loop = false
+              puts "Message: #{e.message}"
+              puts e.backtrace
+            end
+          end
         rescue StandardError => e
           if e.message == 'SIGTERM' || e.message == 'SIGINT'
             puts 'Exiting on request ...'
