@@ -28,6 +28,7 @@ module RServiceBus2
       abort
     end
 
+    # rubocop:disable Metrics/MethodLength
     def connect(uri)
       @path = input_dir(uri).path
       @input_filter = []
@@ -54,16 +55,14 @@ module RServiceBus2
         abort
       end
 
-      if parts['input_filter'][0] == 'ZIP'
-      elsif parts['input_filter'][0] == 'GZ'
-      elsif parts['input_filter'][0] == 'TAR'
-      else
+      unless %w[ZIP GZ TAR].include?(parts['input_filter'][0]).nil?
         puts 'Invalid input_filter specified.'
         puts '*** ZIP, or GZ are the only valid input_filters.'
         abort
       end
       @input_filter << parts['input_filter'][0]
     end
+    # rubocop:enable Metrics/MethodLength
 
     def process_content(content)
       content
@@ -86,13 +85,14 @@ module RServiceBus2
     # rubocop:disable Metrics/MethodLength
     def read_content_from_file(file_path)
       content = ''
-      if @input_filter.length > 0
-        if @input_filter[0] == 'ZIP'
+      if @input_filter.positive?
+        case @input_filter[0]
+        when 'ZIP'
           content = read_content_from_zip_file(file_path)
-        elsif @input_filter[0] == 'GZ'
+        when 'GZ'
           content = read_content_from_gz_file(file_path)
-        elsif @input_filter[0] == 'TAR'
-          fail 'TAR reader not implemented'
+        when 'TAR'
+          raise 'TAR reader not implemented'
         end
 
       else
@@ -101,13 +101,25 @@ module RServiceBus2
 
       content
     end
+    # rubocop:enable Metrics/MethodLength
 
     def process_path(file_path)
       content = read_content_from_file(file_path)
       payload = process_content(content)
 
-      send(payload, URI.parse(URI.encode("file://#{file_path}")))
+      send(payload, URI.parse(CGI.escape("file://#{file_path}")))
       content
+    end
+
+    def archive_file(file_path, content)
+      basename = File.basename(file_path)
+      new_file_path = "#{@archivedir}/#{basename}.#{Time.now.strftime('%Y%m%d%H%M%S%L')}.zip"
+      RServiceBus2.log "Writing to archive, #{new_file_path}"
+
+      Zip::ZipOutputStream.open(new_file_path) do |zos|
+        zos.put_next_entry(basename)
+        zos.puts content
+      end
     end
 
     def look
@@ -123,21 +135,12 @@ module RServiceBus2
         RServiceBus2.log "Ready to process, #{file_path}"
         content = process_path(file_path)
 
-        unless @archivedir.nil?
-          basename = File.basename(file_path)
-          new_file_path = "#{@archivedir}/#{basename}.#{Time.now.strftime('%Y%m%d%H%M%S%L')}.zip"
-          RServiceBus2.log "Writing to archive, #{new_file_path}"
-
-          Zip::ZipOutputStream.open(new_file_path) do |zos|
-            zos.put_next_entry(basename)
-            zos.puts content
-          end
-        end
+        archive_file(file_path, content) unless @archivedir.nil?
         File.unlink(file_path)
 
         file_processed += 1
-        RServiceBus2.log "Processed #{file_processed} of #{file_list.length}."
-        RServiceBus2.log "Allow system tick #{self.class.name}"
+        RServiceBus2.log "Processed #{file_processed} of #{file_list.length}.\nAllow system tick #{self.class.name}"
+
         break if file_processed >= max_files_processed
       end
     end

@@ -12,7 +12,7 @@ module RServiceBus2
       CGI.parse(u.query)['timeout1']&.first || 5
     end
 
-    # rubocop:disable Metrics/MethodLength
+    # rubocop:disable Metrics/MethodLength,Metrics/AbcSize
     def connect(uri)
       @uri = uri
       @timeout = deduce_timeout(uri)
@@ -36,7 +36,7 @@ module RServiceBus2
       puts e.message
       puts e.backtrace
     end
-    # rubocop:enable Metrics/MethodLength
+    # rubocop:enable Metrics/MethodLength,Metrics/AbcSize
 
     def look
       job = @beanstalk.reserve @timeout

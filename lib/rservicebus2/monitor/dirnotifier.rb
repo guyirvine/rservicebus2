@@ -14,21 +14,19 @@ module RServiceBus2
       begin
         open_folder uri.path
         unless File.writable?(uri.path)
-          puts "***** Directory is not writable, #{uri.path}."
-          puts "***** Make the directory, #{uri.path}, writable and try again."
+          puts "***** Directory is not writable, #{uri.path}.\n" \
+               "***** Make the directory, #{uri.path}, writable and try again."
           abort
         end
       rescue Errno::ENOENT
-        puts "***** Directory does not exist, #{uri.path}."
-        puts "***** Create the directory, #{uri.path}, and try again."
-        puts "***** eg, mkdir #{uri.path}"
+        puts "***** Directory does not exist, #{uri.path}.\n" \
+             "***** Create the directory, #{uri.path}, and try again.\n" \
+             "***** eg, mkdir #{uri.path}"
         abort
       rescue Errno::ENOTDIR
-        puts "***** The specified path does not point to a directory,
-              #{uri.path}."
-        puts "***** Either repoint path to a directory, or remove, #{uri.path},
-              and create it as a directory."
-        puts "***** eg, rm #{uri.path} && mkdir #{uri.path}"
+        puts "***** The specified path does not point to a directory, #{uri.path}." \
+             "***** Either repoint path to a directory, or remove, #{uri.path}, and create it as a directory." \
+             "***** eg, rm #{uri.path} && mkdir #{uri.path}"
         abort
       end
 
@@ -55,19 +53,14 @@ module RServiceBus2
               abort
             end
           rescue Errno::ENOENT
-            puts "***** Processing Directory does not exist,
-                  #{processing_uri.path}."
-            puts "***** Create the directory, #{processing_uri.path}, and try
-                  again."
-            puts "***** eg, mkdir #{processing_uri.path}"
+            puts "***** Processing Directory does not exist, #{processing_uri.path}." \
+                 "***** Create the directory, #{processing_uri.path}, and try again." \
+                 "***** eg, mkdir #{processing_uri.path}"
             abort
           rescue Errno::ENOTDIR
-            puts "***** Processing Directory does not point to a directory,
-                  #{processing_uri.path}."
-            puts "***** Either repoint path to a directory, or remove,
-                  #{processing_uri.path}, and create it as a directory."
-            puts "***** eg, rm #{processing_uri.path} && mkdir
-                  #{processing_uri.path}"
+            puts "***** Processing Directory does not point to a directory, #{processing_uri.path}." \
+                 "***** Either repoint path to a directory, or remove, #{processing_uri.path}, and create it as a directory.\n" \
+                 "***** eg, rm #{processing_uri.path} && mkdir #{processing_uri.path}"
             abort
           end
 
@@ -80,7 +73,7 @@ module RServiceBus2
     end
 
     def look
-      file_list = get_files
+      file_list = files
       file_list.each do |file_path|
         new_path = move_file(file_path, @processing_folder)
         send(nil, URI.parse("file://#{new_path}"))
@@ -97,8 +90,8 @@ module RServiceBus2
       Pathname.new(dest).join(filename)
     end
 
-    def get_files
-      Dir.glob(Pathname.new("#{@Path}").join(@Filter) ).select { |f| File.file?(f) }
+    def files
+      Dir.glob(Pathname.new(@path).join(@filter)).select { |f| File.file?(f) }
     end
   end
 end
