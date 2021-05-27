@@ -18,8 +18,8 @@ module RServiceBus2
     def commit
       @connection.commit
     end
-    # Transaction Semantics
 
+    # Transaction Semantics
     def rollback
       @connection.rollback
     end

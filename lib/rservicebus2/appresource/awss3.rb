@@ -11,6 +11,8 @@ module RServiceBus2
       Aws::S3::Client.new(region: region)
     end
 
-    def finished; end
+    def finished
+      RServiceBus2.rlog "#{self.class.name}. Finished"
+    end
   end
 end

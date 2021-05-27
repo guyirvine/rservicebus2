@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'redis'
 require 'rservicebus2/mq'
 
@@ -5,38 +7,31 @@ module RServiceBus2
   # Redis client implementation.
   class MQRedis < MQ
     # Connect to the broker
-    # rubocop:disable Metrics/AbcSize,Metrics/MethodLength
     def connect(host, port)
       port ||= 6379
       string = "#{host}:#{port}"
 
-      begin
-        @redis = Redis.new(:host => host, :port => port)
-
-      rescue Exception => e
-        puts e.message
-        puts 'Error connecting to Redis for mq'
-        puts "Host string, #{string}"
-        abort()
-      end
+      @redis = Redis.new(host: host, port: port)
+    rescue StandardError => e
+      puts e.message
+      puts 'Error connecting to Redis for mq'
+      puts "Host string, #{string}"
+      abort
     end
 
     # Connect to the queue
-    def subscribe( queuename )
+    def subscribe(queuename)
       @queuename = queuename
     end
 
     # Get next msg from queue
     def pop
-      if @redis.llen( @queuename ) == 0 then
+      if @redis.llen(@queuename).zero?
         sleep @timeout
-        raise NoMsgToProcess.new
+        raise NoMsgToProcess
       end
 
-      return @redis.lindex @queuename, 0
-    end
-
-    def returnToQueue
+      @redis.lindex @queuename, 0
     end
 
     # "Commit" queue
@@ -45,9 +40,8 @@ module RServiceBus2
     end
 
     # At least called in the Host rescue block, to ensure all network links are healthy
-    def send( queueName, msg )
-      @redis.rpush queueName, msg
+    def send(queue_name, msg)
+      @redis.rpush queue_name, msg
     end
-
   end
 end

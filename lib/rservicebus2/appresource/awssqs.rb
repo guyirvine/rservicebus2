@@ -22,6 +22,8 @@ module RServiceBus2
       }
     end
 
-    def finished; end
+    def finished
+      RServiceBus2.rlog "#{self.class.name}. Finished"
+    end
   end
 end

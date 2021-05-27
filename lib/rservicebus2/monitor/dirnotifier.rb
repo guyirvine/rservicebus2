@@ -9,67 +9,50 @@ module RServiceBus2
   class MonitorDirNotifier < Monitor
     attr_reader :path, :processing_folder, :filter
 
+    def validate_directory(path, param_name)
+      open_folder path
+      return if File.writable?(path)
+
+      puts "***** #{param_name} is not writable, #{path}.\n
+           ***** Make the directory, #{path}, writable and try again."
+      abort
+    rescue Errno::ENOENT
+      puts "***** #{param_name} does not exist, #{path}.\n" \
+           "***** Create the directory, #{path}, and try again.\n" \
+           "***** eg, mkdir #{path}"
+      abort
+    rescue Errno::ENOTDIR
+      puts "***** The specified path does not point to a directory, #{path}.
+           ***** Either repoint path to a directory, or remove, #{path}, and create it as a directory.
+           ***** eg, rm #{path} && mkdir #{path}"
+      abort
+    end
+
+    def validate_processing_directory(uri)
+      if uri.query.nil?
+        puts '***** Processing Directory is not specified.' \
+             '***** Specify the Processing Directory as a query string in the Path URI' \
+             "***** eg, '/#{uri.path}?processing=*ProcessingDir*'"
+        abort
+      end
+
+      parts = CGI.parse(uri.query)
+      return unless parts.key? 'processing'
+
+      processing_uri = URI.parse parts['processing'][0]
+      validate_directory processing_uri.path, 'Processing Directory'
+      @processing_folder = processing_uri.path
+    end
+
     def connect(uri)
       # Pass the path through the Dir object to check syntax on startup
-      begin
-        open_folder uri.path
-        unless File.writable?(uri.path)
-          puts "***** Directory is not writable, #{uri.path}.\n" \
-               "***** Make the directory, #{uri.path}, writable and try again."
-          abort
-        end
-      rescue Errno::ENOENT
-        puts "***** Directory does not exist, #{uri.path}.\n" \
-             "***** Create the directory, #{uri.path}, and try again.\n" \
-             "***** eg, mkdir #{uri.path}"
-        abort
-      rescue Errno::ENOTDIR
-        puts "***** The specified path does not point to a directory, #{uri.path}." \
-             "***** Either repoint path to a directory, or remove, #{uri.path}, and create it as a directory." \
-             "***** eg, rm #{uri.path} && mkdir #{uri.path}"
-        abort
-      end
 
+      validate_directory uri, 'Directory'
       @path = uri.path
+      validate_processing_directory(uri)
 
-      if uri.query.nil?
-        puts '***** Processing Directory is not specified.'
-        puts '***** Specify the Processing Directory as a query string in the
-              Path URI'
-        puts "***** eg, '/#{uri.path}?processing=*ProcessingDir*"
-        abort
-      else
-        parts = CGI.parse(uri.query)
-
-        if parts.key? 'processing'
-          processing_uri = URI.parse parts['processing'][0]
-          begin
-            open_folder processing_uri.path
-            unless File.writable?(processing_uri.path)
-              puts "***** 1Processing Directory is not writable,
-                    #{processing_uri.path}."
-              puts "***** Make the directory, #{processing_uri.path},
-                    writable and try again."
-              abort
-            end
-          rescue Errno::ENOENT
-            puts "***** Processing Directory does not exist, #{processing_uri.path}." \
-                 "***** Create the directory, #{processing_uri.path}, and try again." \
-                 "***** eg, mkdir #{processing_uri.path}"
-            abort
-          rescue Errno::ENOTDIR
-            puts "***** Processing Directory does not point to a directory, #{processing_uri.path}." \
-                 "***** Either repoint path to a directory, or remove, #{processing_uri.path}, and create it as a directory.\n" \
-                 "***** eg, rm #{processing_uri.path} && mkdir #{processing_uri.path}"
-            abort
-          end
-
-          @processing_folder = processing_uri.path
-        end
-
-        @filter = '*'
-        @filter = parts['filter'][0] if parts.key? 'filter'
-      end
+      @filter = '*'
+      @filter = parts['filter'][0] if parts.key? 'filter'
     end
 
     def look

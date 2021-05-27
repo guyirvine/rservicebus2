@@ -33,7 +33,7 @@ module RServiceBus2
       finished
     end
 
-    # A notification that ocurs after getResource, to allow cleanup
+    # Allow for cleanup, outside of transaction semantics
     def finished
       @connection.close
     end
@@ -53,12 +53,18 @@ module RServiceBus2
     end
 
     # Transaction Semantics
-    def begin; end
+    def begin
+      RServiceBus2.rlog "#{self.class.name}. Default transaction.begin called"
+    end
 
     # Transaction Semantics
-    def commit; end
+    def commit
+      RServiceBus2.rlog "#{self.class.name}. Default transaction.commit called"
+    end
 
     # Transaction Semantics
-    def rollback; end
+    def rollback
+      RServiceBus2.rlog "#{self.class.name}. Default transaction.rollback called"
+    end
   end
 end

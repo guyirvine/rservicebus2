@@ -36,7 +36,9 @@ module RServiceBus2
     end
 
     # A notification that allows cleanup
-    def finished; end
+    def finished
+      RServiceBus2.rlog "#{self.class.name}. Default Finished"
+    end
 
     # At least called in the Host rescue block, to ensure all network links
     #  are healthy
