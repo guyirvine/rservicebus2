@@ -91,7 +91,7 @@ module RServiceBus2
     # rubocop:disable Metrics/MethodLength
     def read_content_from_file(file_path)
       content = ''
-      if @input_filter.positive?
+      if @input_filter.length.positive?
         case @input_filter[0]
         when 'ZIP'
           content = read_content_from_zip_file(file_path)
