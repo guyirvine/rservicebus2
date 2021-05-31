@@ -4,7 +4,7 @@ require 'csv'
 
 # Helper functions
 module RServiceBus2
-  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,Time,UUIDTools::UUID'
+  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,Time,UUIDTools::UUID,URI::Generic,URI::RFC3986_Parser,Symbol,Regexp'
 
   def self.permitted_classes
     permitted_classes_string = get_value('PERMITTED_CLASSES', DEFAULT_PERMITTED_CLASSES)
