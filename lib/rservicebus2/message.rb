@@ -55,9 +55,9 @@ module RServiceBus2
 
     # @return [Object] The msg to be sent
     def msg
-      return YAML.load(Zlib::Inflate.inflate(@_msg)) if @compressed == true
+      return RServiceBus2.safe_load(Zlib::Inflate.inflate(@_msg)) if @compressed == true
 
-      YAML.load(@_msg)
+      RServiceBus2.safe_load(@_msg)
     rescue ArgumentError => e
       raise e if e.message.index('undefined class/module ').nil?
 

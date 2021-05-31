@@ -140,14 +140,19 @@ module RServiceBus2
         next if file_path.end_with?('.')
 
         msg_name = get_msg_name(file_path)
+        RServiceBus2.add_to_permitted_classes(
+          msg_name.gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
+        )
+
         if File.directory?(file_path)
           load_handlers_from_second_level_path(msg_name, file_path)
-        else
-          # Classify
-          handler_name = "message_handler_#{msg_name}"
-                         .gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
-          load_handler(msg_name, file_path, handler_name)
+          next
         end
+
+        # Classify
+        handler_name = "message_handler_#{msg_name}"
+                       .gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
+        load_handler(msg_name, file_path, handler_name)
       end
 
       self

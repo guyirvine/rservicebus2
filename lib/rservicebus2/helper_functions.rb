@@ -1,7 +1,27 @@
 # frozen_string_literal: true
 
+require 'csv'
+
 # Helper functions
 module RServiceBus2
+  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,Time,UUIDTools::UUID'
+
+  def self.permitted_classes
+    permitted_classes_string = get_value('PERMITTED_CLASSES', DEFAULT_PERMITTED_CLASSES)
+    CSV.parse(permitted_classes_string)[0]
+  end
+
+  def self.add_to_permitted_classes(string)
+    ENV['PERMITTED_CLASSES'] = permitted_classes
+                               .push(string)
+                               .uniq
+                               .to_csv
+  end
+
+  def self.safe_load(body)
+    YAML.safe_load(body, permitted_classes: permitted_classes)
+  end
+
   def self.convert_dto_to_hash(obj)
     hash = {}
     obj.instance_variables.each do |var|

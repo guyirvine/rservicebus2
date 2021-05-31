@@ -13,7 +13,8 @@ def return_msg(beanstalk, job, request_nbr)
 
   msg_name = payload.match('(\w*)', start_index)[1]
 
-  msg = YAML.load(payload)
+  msg = RServiceBus2.safe_load(payload)
+
   if msg.last_error_string.nil?
     puts "*** Requested msg, #{request_nbr}, does not have a sourceQueue to
           which it can be returned"

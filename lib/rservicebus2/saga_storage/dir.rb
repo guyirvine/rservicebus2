@@ -81,7 +81,7 @@ module RServiceBus2
 
       return {} if content == ''
 
-      YAML.load(content)
+      RServiceBus2.safe_load(content)
     end
   end
 end

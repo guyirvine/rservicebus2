@@ -114,7 +114,7 @@ module RServiceBus2
     def process
       # Get the next job from the source queue
       job = @source.reserve @timeout
-      msg = YAML.load(job.body)
+      msg = RServiceBus2.safe_load(job.body)
 
       connect(msg.remote_host_name)
 

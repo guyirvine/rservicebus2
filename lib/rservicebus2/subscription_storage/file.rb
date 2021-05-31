@@ -7,11 +7,11 @@ module RServiceBus2
       RServiceBus2.log 'Load subscriptions'
       return {} unless File.exist?(@uri.path)
 
-      YAML.load(File.open(@uri.path))
+      RServiceBus2.safe_load(File.open(@uri.path))
     end
 
     def add(event_name, queue_name)
-      s = File.exist?(@uri.path) ? YAML.load(File.open(@uri.path)) : {}
+      s = File.exist?(@uri.path) ? RServiceBus2.safe_load(File.open(@uri.path)) : {}
       s[event_name] = [] if s[event_name].nil?
 
       s[event_name] << queue_name

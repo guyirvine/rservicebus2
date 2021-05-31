@@ -162,7 +162,7 @@ module RServiceBus2
           body = @mq.pop
           begin
             @stats.inc_total_processed
-            @msg = YAML.load(body)
+            @msg = RServiceBus2.safe_load(body)
             case @msg.msg.class.name
             when 'RServiceBus2::MessageSubscription'
               @subscription_manager.add(@msg.msg.event_name,
