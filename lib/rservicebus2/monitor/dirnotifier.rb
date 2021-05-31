@@ -9,30 +9,46 @@ module RServiceBus2
   class MonitorDirNotifier < Monitor
     attr_reader :path, :processing_folder, :filter
 
+    def directory_not_writable(path, param_name)
+      "***** #{param_name} is not writable, #{path}.\n" \
+      "***** Make the directory, #{path}, writable and try again."
+    end
+
+    def directory_does_not_exist(path, param_name)
+      "***** #{param_name} does not exist, #{path}.\n" \
+      "***** Create the directory, #{path}, and try again.\n" \
+      "***** eg, mkdir #{path}"
+    end
+
+    def path_is_not_a_directory(path)
+      "***** The specified path does not point to a directory, #{path}.\n" \
+      "***** Either repoint path to a directory, or remove, #{path}, and create it as a directory.\n" \
+      "***** eg, rm #{path} && mkdir #{path}"
+    end
+
+    def processing_directory_not_specified(path)
+      '***** Processing Directory is not specified.' \
+      '***** Specify the Processing Directory as a query string in the Path URI' \
+      "***** eg, '/#{path}?processing=*ProcessingDir*'"
+    end
+
     def validate_directory(path, param_name)
       open_folder path
       return if File.writable?(path)
 
-      puts "***** #{param_name} is not writable, #{path}.\n
-           ***** Make the directory, #{path}, writable and try again."
+      puts directory_not_writable(path, param_name)
       abort
     rescue Errno::ENOENT
-      puts "***** #{param_name} does not exist, #{path}.\n" \
-           "***** Create the directory, #{path}, and try again.\n" \
-           "***** eg, mkdir #{path}"
+      puts directory_does_not_exist(path, param_name)
       abort
     rescue Errno::ENOTDIR
-      puts "***** The specified path does not point to a directory, #{path}.
-           ***** Either repoint path to a directory, or remove, #{path}, and create it as a directory.
-           ***** eg, rm #{path} && mkdir #{path}"
+      puts path_is_not_a_directory(path)
       abort
     end
 
     def validate_processing_directory(uri)
       if uri.query.nil?
-        puts '***** Processing Directory is not specified.' \
-             '***** Specify the Processing Directory as a query string in the Path URI' \
-             "***** eg, '/#{uri.path}?processing=*ProcessingDir*'"
+        puts processing_directory_not_specified(uri.path)
         abort
       end
 
