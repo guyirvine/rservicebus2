@@ -99,6 +99,7 @@ module RServiceBus2
 
     def initialize
       RServiceBus2.rlog "Current directory: #{Dir.pwd}"
+      YamlSafeLoader.instance
       @config = ConfigFromEnv.new
                              .load_host_section
                              .load_contracts
