@@ -4,22 +4,9 @@ require 'csv'
 
 # Helper functions
 module RServiceBus2
-  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,Time,UUIDTools::UUID,URI::Generic,URI::RFC3986_Parser,Symbol,Regexp'
-
-  def self.permitted_classes
-    permitted_classes_string = get_value('PERMITTED_CLASSES', DEFAULT_PERMITTED_CLASSES)
-    CSV.parse(permitted_classes_string)[0]
-  end
-
-  def self.add_to_permitted_classes(string)
-    ENV['PERMITTED_CLASSES'] = permitted_classes
-                               .push(string)
-                               .uniq
-                               .to_csv
-  end
-
   def self.safe_load(body)
-    YAML.safe_load(body, permitted_classes: permitted_classes)
+    # YAML.safe_load(body, permitted_classes: Module.constants)
+    YamlSafeLoader.instance.load(body)
   end
 
   def self.convert_dto_to_hash(obj)

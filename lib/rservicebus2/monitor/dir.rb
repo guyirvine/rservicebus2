@@ -146,7 +146,8 @@ module RServiceBus2
         process_path(file_path)
 
         file_processed += 1
-        RServiceBus2.log "Processed #{file_processed} of #{file_list.length}.\nAllow system tick #{self.class.name}"
+        RServiceBus2.log "Processed #{file_processed} of #{file_list.length}."
+        RServiceBus2.log "Allow system tick #{self.class.name}"
 
         break if file_processed >= max_files_processed
       end

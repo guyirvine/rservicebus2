@@ -140,10 +140,8 @@ module RServiceBus2
         next if file_path.end_with?('.')
 
         msg_name = get_msg_name(file_path)
-        RServiceBus2.add_to_permitted_classes(
-          msg_name.gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1')
-        )
-
+        YamlSafeLoader.instance.add_permitted_class(msg_name
+                       .gsub(/(?<=_|^)(\w)/) { Regexp.last_match(1).upcase }.gsub(/(?:_)(\w)/, '\1'))
         if File.directory?(file_path)
           load_handlers_from_second_level_path(msg_name, file_path)
           next

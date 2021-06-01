@@ -23,6 +23,7 @@ require 'rservicebus2/config'
 require 'rservicebus2/endpointmapping'
 require 'rservicebus2/statistic_manager'
 require 'rservicebus2/audit'
+require 'rservicebus2/yaml_safe_loader'
 
 require 'rservicebus2/message'
 require 'rservicebus2/message/subscription'

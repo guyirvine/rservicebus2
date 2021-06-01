@@ -4,6 +4,8 @@ require 'rservicebus2/agent'
 require './contract'
 
 ENV['RSBMQ'] = 'beanstalk://localhost'
+ENV['PERMITTED_CLASSES'] = 'HelloWorld'
+
 agent = RServiceBus2::Agent.new
 
 1.upto(2) do |request_nbr|
