@@ -39,6 +39,8 @@ module RServiceBus2
   end
 
   def self.create_anonymous_class(name_for_class)
+    Module.const_get(name_for_class)
+  rescue NameError
     new_anonymous_class = Class.new(Object)
     Object.const_set(name_for_class, new_anonymous_class)
     Object.const_get(name_for_class).new
