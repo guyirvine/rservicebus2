@@ -7,7 +7,7 @@ require 'singleton'
 class YamlSafeLoader
   include Singleton
 
-  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,Time,UUIDTools::UUID,YamlSafeLoader,' \
+  DEFAULT_PERMITTED_CLASSES = 'RServiceBus2::Message,RServiceBus2::ErrorMessage,Time,UUIDTools::UUID,YamlSafeLoader,' \
                               'URI::Generic,URI::RFC3986_Parser,Symbol,Regexp'
 
   def initialize
